@@ -73,12 +73,20 @@ WSGI_APPLICATION = 'medical.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+'default': {
+    'ENGINE': None, # 把默认的数据库连接至为None
 }
+}
+from mongoengine import connect
+connect('test',host='localhost',port=27017,username='',password='',authentication_source='admin')
 
 
 # Password validation
