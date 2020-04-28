@@ -81,9 +81,9 @@ WSGI_APPLICATION = 'medical.wsgi.application'
 #}
 
 DATABASES = {
-'default': {
-    'ENGINE': None, # 把默认的数据库连接至为None
-}
+    'default': {
+        'ENGINE': None, # 把默认的数据库连接至为None
+    }
 }
 from mongoengine import connect
 connect('test',host='localhost',port=27017,username='',password='',authentication_source='admin')
