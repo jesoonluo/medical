@@ -1,0 +1,181 @@
+.cube {
+  // width: 200px;
+  // height: 200px;
+  margin: 10px auto;
+  // padding: 160px;
+  position: relative;
+  // perspective: 600px;
+  // perspective: 600px;
+}
+.cube-inner {
+  width: 400px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: 0.3s;
+  /*transform-origin:50% 50% -100px -100px;*/
+  transform-origin: 50% 50% -100px;
+}
+.cube-inner .single-side {
+  width: 400px;
+  height: 200px;
+  position: absolute;
+  color: #fff;
+  font-size: 50px;
+  text-align: center;
+}
+.cube-inner .single-side span {
+  display: block;
+  line-height: 200px;
+}
+.cube-inner .single-side:after,
+.cube-inner .single-side:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 200px;
+  height: 1px;
+  transform: scaleX(0.8);
+  transform: scaleX(0.8);
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+.cube-inner .single-side:after {
+  top: auto;
+  bottom: 0;
+}
+.cube-inner .single-side span:after,
+.cube-inner .single-side span:before {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  content: '';
+  position: absolute;
+  height: 200px;
+  width: 1px;
+  transform: scaleY(0.8);
+  transform: scaleY(0.8);
+  background: linear-gradient(
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background: linear-gradient(
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+.cube-inner .single-side span:after {
+  left: auto;
+  right: 0;
+}
+.cube-inner .single-side.s1 {
+  /*s1顶部*/
+  left: 0;
+  top: -35px;
+  // background: radial-gradient(circle, rgba(255, 255, 255, 0.88), #00adff);
+  background: linear-gradient(to bottom right, white, rgb(100, 99, 99));
+  transform-origin: bottom;
+  transform: rotateX(82deg);
+  transform: skewX(-45deg);
+  height: 35px;
+}
+
+.cube-inner .single-side.s2 {
+  /*s2正面*/
+  left: 0;
+  top: 0;
+  z-index: 6;
+  transform-origin: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.88), #8446e4);
+  background: linear-gradient(to bottom right, white, rgb(100, 99, 99));
+}
+.cube-inner .single-side.s3 {
+  /*s3底部*/
+  left: 0;
+  top: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.88), #100067);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.88), #100067);
+  transform-origin: top;
+  transform: rotateX(-90deg);
+}
+.cube-inner .single-side.s4 {
+  /*s4背部*/
+  z-index: 2;
+  left: 0;
+  top: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.88), #f0c);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.88), #f0c);
+  transform: translateZ(-200px) rotateX(180deg); /*rotateZ(-180deg) 左右旋转的时候，Z轴旋转180°，因为字是倒着的*/
+}
+.cube-inner .single-side.s5 {
+  /*s5左侧*/
+  left: -200px;
+  top: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.88),
+    rgba(33, 33, 33, 1)
+  );
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.88),
+    rgba(33, 33, 33, 1)
+  );
+  transform-origin: right;
+  transform: rotateY(-90deg);
+}
+.cube-inner .single-side.s6 {
+  /*s6右侧*/
+  right: -35px;
+  top: 0;
+  transform-origin: left;
+  transform-origin: left;
+  // background: radial-gradient(circle, rgba(255, 255, 255, 0.88), gray);
+  background: linear-gradient(to bottom right, white, rgb(100, 99, 99));
+  transform: rotateY(90deg);
+  transform: rotateY(90deg);
+  transform: skewY(-45deg);
+  width: 35px;
+}
+.cube .cube-inner.running {
+  transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  // animation: elfCube 10s infinite ease-in-out;
+  // animation: elfCube 10s infinite ease alternate;
+}
+
+@keyframes elfCube {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  50% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+  100% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+}
+@keyframes elfCube {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  50% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+  100% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+}

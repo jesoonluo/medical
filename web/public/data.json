@@ -1,0 +1,66 @@
+{
+    "store": [
+      {
+        "type_name": "binxing",
+        "type": "1",
+        "terminal_name": "",
+        "id": 1,
+        "coding_method": 1,
+        "row": 10,
+        "col": 10,
+        "frozen_box": [
+          {
+            "id": 112,
+            "progress": 50,
+            "code_name": "A1",
+            "type_name": "binxing"
+          },
+          {
+            "id": 22,
+            "progress": 50,
+            "code_name": "A2",
+            "type_name": "binxing"
+          }
+        ],
+        "parentId": 0,
+        "rank": 1
+      },
+      {
+        "type_name": "yedanguan",
+        "type": "1",
+        "id": 2,
+        "frozen_box_num": 10,
+        "frozen_box": [
+          {
+            "id": 32,
+            "progress": 50,
+            "code_name": "1"
+          }
+        ],
+        "parentId": 0,
+        "rank": 1
+      },
+      {
+        "type_name": "folder",
+        "id": 3,
+        "parentId": 0,
+        "rank": 1
+      },
+      {
+        "type_name": "yedanguan",
+        "type": "1",
+        "id": 4,
+        "frozen_box_num": 10,
+        "frozen_box": [
+          {
+            "id": 32,
+            "progress": 50,
+            "code_name": "1"
+          }
+        ],
+        "parentId": 1,
+        "rank": 2
+      }
+    ]
+  
+}

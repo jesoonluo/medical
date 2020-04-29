@@ -1,0 +1,124 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box; // 1
+  background-repeat: no-repeat;
+}
+html,
+body,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ul,
+ol,
+dl,
+li,
+dt,
+dd,
+p,
+blockquote,
+pre,
+form,
+fieldset,
+table,
+th,
+td {
+  border: none;
+  font-family: "微软雅黑", "黑体", "宋体";
+  font-size: 100%;
+  margin: 0px;
+  padding: 0px;
+  letter-spacing: 1px;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+// body {
+//   line-height: 1;
+//   min-width: 1180px;
+// }
+html,
+body {
+  line-height: 1;
+  height: 100%;
+  width: 100%;
+  background: #f5f5f5;
+}
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+a {
+  text-decoration: none;
+  color: #000;
+  cursor: pointer;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+input,
+textarea,
+button,
+video {
+  &:focus {
+    outline: none;
+  }
+  box-sizing: border-box;
+  margin: 0;
+}
+input::-webkit-input-placeholder {
+  color: #bbbbbb;
+  font-size: 12px;
+}
+.cp {
+  cursor: pointer;
+}
+img {
+  vertical-align: middle;
+  border-style: none;
+  max-width: 100%;
+  opacity: 1;
+  transition: opacity 0.8s;
+}
+.ob-fill {
+  object-fit: fill;
+}
+.ob-contain {
+  object-fit: contain;
+}
+.ob-cover {
+  object-fit: cover;
+}
+.ob-none {
+  object-fit: none;
+}
+.ob-scale-down {
+  object-fit: scale-down;
+}
