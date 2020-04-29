@@ -68,6 +68,12 @@ def query_storage_device_by_room_id(room_id):
 def query_freeze_shelf_by_store_id(store_id):
     return freeze_shelf.objects.filter(storageid =store_id).all()
 
+def query_shelf_by_id(shelf_id):
+    return freeze_shelf.objects.get(shelf_id)
+
+def query_boxs_by_shelf_id(shelf_id):
+    return freeze_box.objects.filter(shelf_id=shelf_id).all()
+
 def add_new_storage(storagename,utype,line_order,room_id, storageline=10, storagecolumn=10):
     new_store = storage_device(
         storagename = storagename,
@@ -86,7 +92,7 @@ def add_new_storage(storagename,utype,line_order,room_id, storageline=10, storag
         # 此处输入系统log
         print(e)
         return None
-    return str(new_stora._id)
+    return str(new_store._id)
 
 def add_new_freeze_shelf(shelfname,utype,line_order,storage_id,shelfline=10,shelfcolumn=10):
     new_shelf = freeze_shelf(
@@ -108,3 +114,25 @@ def add_new_freeze_shelf(shelfname,utype,line_order,storage_id,shelfline=10,shel
         return None
     return str(new_shelf._id)
 
+def add_new_freeze_box(boxname,boxid,utype,boxorder,line_order,shelf_id,box_note,boxline=10,boxcolumn=10):
+    new_box = freeze_box(
+        boxname = boxname,
+        boxid = boxid,         # 冻存盒自定义id
+        boxorder = boxorder,   # 根据冻存架的类别确定1,11,A1
+        boxtype = utype,
+        boxline = boxline,
+        boxcolumn = boxcolumn,
+        line_order = line_order,
+        shelf_id = shelf_id, 
+        box_note=box_note,     # 冻存盒描述
+    )
+    try:
+        new_box.save()
+        log = _insert_log('freeze_box', 'add', str(new_box._id))
+        if not log:
+            raise Exception('日志插入异常')
+    except Exception as e:
+        # 此处输入系统log
+        print(e)
+        return None
+    return str(new_box._id)

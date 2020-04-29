@@ -67,10 +67,10 @@ def add_new_room(request):
          return JsonResponse(rst)
 
 
-def add_new_storage_device():
+def add_new_storage_device(request):
     ''' 添加新的设备 '''
     name = request.POST['name']
-    line_order = request.POST['rank']
+    line_order = request.POST['line_order']
     room_id = request.POST['room_id']
     utype = request.POST['utype']
     all_room_ids = query_all_room_ids()
@@ -101,13 +101,13 @@ def add_new_storage_device():
          return JsonResponse(rst)
     
 
-def add_new_freeze_shelf():
+def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
     name = request.POST['name']
-    line_order = request.POST['rank']
+    line_order = request.POST['line_order']
     shelfline = request.POST['shelfline']     # 行数
     shelfcolumn = request.POST['shelfcolumn'] # 列数
-    store_id = request.POST['store_id']       # 存储设备id
+    store_id = request.POST['storage_id']     # 存储设备id
     utype = request.POST['utype']             # 冻存架排列方式(1,2,3)
     all_storage_ids = query_all_storage_ids()
     msg = ''
@@ -120,6 +120,63 @@ def add_new_freeze_shelf():
          }
          return JsonResponse(rst)
     flag = add_new_freeze_shelf(shelfname,utype,line_order,store_id,shelfline,shelfcolumn)
+    if flag:
+        rst = {
+             'success': flag,
+             'code': 200,
+             'msg': msg
+        }
+        return JsonResponse(rst)
+    else:
+         msg = u'创建失败，数据库错误'
+         rst = {
+             'success': False,
+             'code': 301,
+             'msg': msg
+         }
+         return JsonResponse(rst)
+
+
+def add_new_freeze_box(request):
+    ''' 添加新的冻存盒 '''
+    name = request.POST['name']
+    line_order = request.POST['line_order']
+    boxline = request.POST['boxline']         # 行数
+    boxcolumn = request.POST['boxcolumn']     # 列数
+    shelf_id = request.POST['shelf_id']       # 冻存架id
+    utype = request.POST['utype']             # 冻存盒排列方式(1,2,3)
+    msg = ''
+    shelf = query_shelf_by_id(shelf_id)
+    if not shelf:
+         msg = u'冻存架不存在,请确认'
+         rst = {
+             'success': False,
+             'code': 304,
+             'msg': msg
+         }
+         return JsonResponse(rst)
+    # 获取已经存在的冻存盒数
+    boxs = query_boxs_by_shelf_id(shelf_id)
+    # TODO根据冻存架type,确定排列位子
+    box_order = ''
+    if shelf.utype == '1': #1,2,3...,11
+        box_order = len(boxs) + 1
+    elif shelf.utype == '2':   #11,21,31
+        num_shang = len(boxs)//shelf.shelfline
+        num_yu = len(boxs)%shelf.shelfline
+        if num_yu == 0:
+            box_order = str(num_shang+1) + str(1)
+        box_order = str(num_shang) + str(num_yu + 1)
+    elif shelf.utype == '3':   #11,21,31
+        en_ch = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H', '9': 'I', '10': 'J', '11': 'K', '12': 'L', '13': 'M', '14': 'N'}
+        num_shang = len(boxs)//shelf.shelfline
+        num_yu = len(boxs)%shelf.shelfline
+        if num_yu == 0:
+            box_order = en_ch.get(str(num_shang+1)) + str(1)
+        box_order = en_ch.get(str(num_shang)) + str(num_yu + 1)
+    box_id = request.POST.get('boxid', 'system_add_id')
+    box_note = request.POST.get('boxnote', 'system_add_note')
+    flag = add_new_freeze_box(name,box_id,utype,box_order,line_order,shelf_id,box_note,boxline,boxcolumn)
     if flag:
         rst = {
              'success': flag,

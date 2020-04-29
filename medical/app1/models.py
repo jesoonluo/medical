@@ -37,7 +37,7 @@ class freeze_box(mongoengine.Document):
     boxtype = mongoengine.StringField(max_length=32)       
     boxline = mongoengine.IntField()
     boxcolumn = mongoengine.IntField()
-    boxnote = mongoengine.GenericEmbeddedDocumentField()
+    boxnote = mongoengine.GenericEmbeddedDocumentField(default="")
 
 class log_info(mongoengine.Document):
     operate_table = mongoengine.StringField(max_length=32) # 操作表
