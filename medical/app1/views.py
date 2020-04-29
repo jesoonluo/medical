@@ -5,10 +5,20 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Stream
 from mongoengine import StringField,FloatField,IntField,ListField,ObjectIdField
 from bson.objectid import ObjectId
 from .helper import *
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
+def check_login(func):
+    def inner(request,*args, **kwargs):
+        if request.session.get("uname"):
+            return func(request,*args, **kwargs)
+        else:
+            # 返回登录页面
+            return HttpResponseRedirect("/login")
+    return inner
 
+#@check_login
 def query_all_node(request):
     ''' 获取所有节点 '''
     all_room = query_all_room()
@@ -40,14 +50,7 @@ def query_all_node(request):
                 #查询存储设备里的冻存架
     return JsonResponse(rst)
 
-
-def add_first_room(request):
-    flag = init_node_room() 
-    if flag:
-        return HttpResponse('初始化成功')
-    else:
-        return HttpResponse('初始化失败')
-
+@csrf_exempt
 def add_new_room(request):
     name = request.POST['name']
     rank = request.POST['rank']
@@ -81,6 +84,7 @@ def add_new_room(request):
          return JsonResponse(rst)
 
 
+@csrf_exempt
 def add_new_storage_device(request):
     ''' 添加新的设备 '''
     name = request.POST['name']
@@ -118,6 +122,7 @@ def add_new_storage_device(request):
          return JsonResponse(rst)
     
 
+@csrf_exempt
 def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
     name = request.POST['name']
@@ -154,6 +159,7 @@ def add_new_freeze_shelf(request):
          return JsonResponse(rst)
 
 
+@csrf_exempt
 def add_new_freeze_box(request):
     ''' 添加新的冻存盒 '''
     name = request.POST['name']
