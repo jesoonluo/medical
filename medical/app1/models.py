@@ -1,5 +1,7 @@
 import mongoengine
+import datetime
 from django.db import models
+from .helper import now_ts
 
 # Create your models here.
 
@@ -22,7 +24,7 @@ class freeze_shelf(mongoengine.Document):
     storageid = mongoengine.StringField(max_length=64)     #设备id
     shelforder = mongoengine.IntField()                    # 顺序号(用于存储冻存架的顺序)
     shelfname = mongoengine.StringField(max_length=32)
-    shelftype = mongoengine.StringField(max_length=32)
+    shelftype = mongoengine.StringField(max_length=32)     # 冻存架排列方式1-1,11, 2-11,21, 3-A1,B1
     shelfline = mongoengine.IntField()
     shelfecolumn = mongoengine.IntField()
 
@@ -32,10 +34,18 @@ class freeze_box(mongoengine.Document):
     boxorder = mongoengine.IntField()                      #顺序号(用于存储冻存架的顺序)
     boxfname = mongoengine.StringField(max_length=32)
     boxid = mongoengine.StringField(max_length=32)         #冻存盒自定义id
-    boxtype = mongoengine.StringField(max_length=32)
+    boxtype = mongoengine.StringField(max_length=32)       
     boxline = mongoengine.IntField()
     boxcolumn = mongoengine.IntField()
     boxnote = mongoengine.GenericEmbeddedDocumentField()
+
+class log_info(mongoengine.Document):
+    operate_table = mongoengine.StringField(max_length=32) # 操作表
+    operate_type = mongoengine.StringField(max_length=16)  # 操作类别add, delete, update
+    operate_id = mongoengine.StringField(max_length=64)    # 操作对象的id
+    operate_desc = mongoengine.GenericEmbeddedDocumentField(default="")   # 操作描述
+    destination_id = mongoengine.StringField(max_length=64, default="")   # 目的id,update时候用
+    dt_create = mongoengine.DateTimeField(now_ts())
 
 # 暂时不用
 class room_storage_relation():

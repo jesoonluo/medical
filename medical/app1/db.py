@@ -1,18 +1,37 @@
-from medical.models import room,storage_devica,freeze_shelf,freeze_box
+from .models import room,storage_device,freeze_shelf,freeze_box
 from bson.objectid import ObjectId
 
+def _insert_log(table, op_type, op_id, desc_id='', desc_text=''):
+    log = log_info.objects.create(
+        operate_table = table,
+        operate_type = op_type,
+        operate_id = str(op_id),
+        operate_desc = desc_text,
+        destination_id = desc_id
+    )
+    try:
+        log.save()
+    except:
+        return False
+    return True
+
 def init_node_room():
-    exist = room.objects.filter(parent_id=0)
+    exist = room.objects.filter(parent_id='0').first()
     if exist:
-        return str(exist._id)
+        return exist
     new_first_node = room.objects.create(
         name = '全部空间',
-        line_order = 1,                  # 层级
-        parent_id = 0                   # 根节点
+        line_order = 1,                   #层级
+        parent_id = '0'                   #根节点
     )
     try:
         new_first_node.save()
-    except:
+        log = _insert_log('room', 'add', str(new_first_node._id))
+        if not log:
+            raise Exception('日志插入异常')
+    except Exception as e:
+        # 此处输入系统log
+        print(e)
         return None
     return new_first_node
 
@@ -25,7 +44,12 @@ def add_new_room(name, line_order, parent_id):
     )
     try:
         new_node.save()
-    except:
+        log = _insert_log('room', 'add', str(new_node._id))
+        if not log:
+            raise Exception('日志插入异常')
+    except Exception as e:
+        # 此处输入系统log
+        print(e)
         return None
     return str(new_node._id)
 
@@ -35,20 +59,52 @@ def query_all_room():
 def query_all_room_ids():
     return [str(i._id) for i in room.objects.all()]
 
-def query_storage_devica_by_room_id(room_id):
-    return storage_devica.objects.filter(room_id=room_id).all()
+def query_all_storage_ids():
+    return [str(i._id) for i in storage_device.objects.all()]
 
-def add_new_storage(storagename,utype,line_order,room_id):
-    new_stora = storage_devica(
+def query_storage_device_by_room_id(room_id):
+    return storage_device.objects.filter(room_id=room_id).all()
+
+def query_freeze_shelf_by_store_id(store_id):
+    return freeze_shelf.objects.filter(storageid =store_id).all()
+
+def add_new_storage(storagename,utype,line_order,room_id, storageline=10, storagecolumn=10):
+    new_store = storage_device(
         storagename = storagename,
         storagetype = utype,
-        storageline = 10,
-        storagecolumn = 10,
+        storageline = storageline,
+        storagecolumn = storagecolumn,
         line_order = line_order,
         room_id = room_id
     )
     try:
-        new_stora.save()
-    except:
+        new_store.save()
+        log = _insert_log('storage_device', 'add', str(new_store._id))
+        if not log:
+            raise Exception('日志插入异常')
+    except Exception as e:
+        # 此处输入系统log
+        print(e)
         return None
     return str(new_stora._id)
+
+def add_new_freeze_shelf(shelfname,utype,line_order,storage_id,shelfline=10,shelfcolumn=10):
+    new_shelf = freeze_shelf(
+        shelfname = shelfname,
+        shelftype = utype,
+        shelfline = shelfline,
+        shelfcolumn = shelfcolumn,
+        line_order = line_order,
+        storageid = storage_id 
+    )
+    try:
+        new_shelf.save()
+        log = _insert_log('freeze_shelf', 'add', str(new_shelf._id))
+        if not log:
+            raise Exception('日志插入异常')
+    except Exception as e:
+        # 此处输入系统log
+        print(e)
+        return None
+    return str(new_shelf._id)
+
