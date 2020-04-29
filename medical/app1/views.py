@@ -52,9 +52,10 @@ def query_all_node(request):
 
 @csrf_exempt
 def add_new_room(request):
+    print('*'*10, dict(request.POST))
     name = request.POST['name']
     rank = request.POST['rank']
-    parent_id = request.POST['parent_id']
+    parent_id = request.POST['room_id']
     all_room_ids = query_all_room_ids()
     msg = ''
     if parent_id not in all_room_ids:

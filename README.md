@@ -8,8 +8,8 @@
 ```json
 Param：{
 "name": "房间名字", 
-"line_order": "rank等级(整型)", 
-"parent_id": "父节点id"
+"rank": "rank等级(整型)", 
+"room_id": "父节点id"
 }
 ```
 # 添加存储设备:
