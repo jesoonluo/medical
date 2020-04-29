@@ -17,7 +17,7 @@ Param：{
 ### 请求方式: POST
 ```json
 Param：{
-"name": "存储空间名字",
+"name": "存储设备名字",
 "rank": "rank等级(整型)", 
 "room_id": "存储空间id",
 "utype": "存储设备编码类别",
