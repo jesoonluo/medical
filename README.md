@@ -49,8 +49,8 @@ Param：{
     "shelf_id": "冻存架id",
     "utype": "冻存盒类别(‘1’，’2’，’3’)",
     "boxline": "冻存盒行数(整型)", 
-    "boxcolumn": "冻存盒列数(整形)"，
-    "boxid"："冻存盒自定义id",
+    "boxcolumn": "冻存盒列数(整形)",
+    "boxid": "冻存盒自定义id",
     "boxnote": "冻存盒描述",
 }
 ```
