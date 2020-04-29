@@ -20,7 +20,7 @@ def query_all_node(request):
         for room in all_room:
             rst['store'].append({k:v for k,v in mongo_to_dict_helper(room).items()})
             # 查询room下的设备列表
-            all_store = query_storage_device_by_room_id(str(room._id))
+            all_store = query_storage_device_by_room_id(str(room.id))
             for store in all_store:
                 rst['store'].append({k:v for k,v in mongo_to_dict_helper(store).items()})
                 #查询存储设备里的冻存架

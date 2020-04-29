@@ -26,7 +26,7 @@ def init_node_room():
     )
     try:
         new_first_node.save()
-        log = _insert_log('room', 'add', str(new_first_node._id))
+        log = _insert_log('room', 'add', str(new_first_node.id))
         if not log:
             raise Exception('日志插入异常')
     except Exception as e:
@@ -44,23 +44,23 @@ def add_new_room(name, line_order, parent_id):
     )
     try:
         new_node.save()
-        log = _insert_log('room', 'add', str(new_node._id))
+        log = _insert_log('room', 'add', str(new_node.id))
         if not log:
             raise Exception('日志插入异常')
     except Exception as e:
         # 此处输入系统log
         print(e)
         return None
-    return str(new_node._id)
+    return str(new_node.id)
 
 def query_all_room():
     return room.objects.all()
 
 def query_all_room_ids():
-    return [str(i._id) for i in room.objects.all()]
+    return [str(i.id) for i in room.objects.all()]
 
 def query_all_storage_ids():
-    return [str(i._id) for i in storage_device.objects.all()]
+    return [str(i.id) for i in storage_device.objects.all()]
 
 def query_storage_device_by_room_id(room_id):
     return storage_device.objects.filter(room_id=room_id).all()
@@ -85,14 +85,14 @@ def add_new_storage(storagename,utype,line_order,room_id, storageline=10, storag
     )
     try:
         new_store.save()
-        log = _insert_log('storage_device', 'add', str(new_store._id))
+        log = _insert_log('storage_device', 'add', str(new_store.id))
         if not log:
             raise Exception('日志插入异常')
     except Exception as e:
         # 此处输入系统log
         print(e)
         return None
-    return str(new_store._id)
+    return str(new_store.id)
 
 def add_new_freeze_shelf(shelfname,utype,line_order,storage_id,shelfline=10,shelfcolumn=10):
     new_shelf = freeze_shelf(
@@ -105,14 +105,14 @@ def add_new_freeze_shelf(shelfname,utype,line_order,storage_id,shelfline=10,shel
     )
     try:
         new_shelf.save()
-        log = _insert_log('freeze_shelf', 'add', str(new_shelf._id))
+        log = _insert_log('freeze_shelf', 'add', str(new_shelf.id))
         if not log:
             raise Exception('日志插入异常')
     except Exception as e:
         # 此处输入系统log
         print(e)
         return None
-    return str(new_shelf._id)
+    return str(new_shelf.id)
 
 def add_new_freeze_box(boxname,boxid,utype,boxorder,line_order,shelf_id,box_note,boxline=10,boxcolumn=10):
     new_box = freeze_box(
@@ -128,11 +128,11 @@ def add_new_freeze_box(boxname,boxid,utype,boxorder,line_order,shelf_id,box_note
     )
     try:
         new_box.save()
-        log = _insert_log('freeze_box', 'add', str(new_box._id))
+        log = _insert_log('freeze_box', 'add', str(new_box.id))
         if not log:
             raise Exception('日志插入异常')
     except Exception as e:
         # 此处输入系统log
         print(e)
         return None
-    return str(new_box._id)
+    return str(new_box.id)
