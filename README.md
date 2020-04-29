@@ -18,6 +18,8 @@ Param：{
 ```json
 Param：{
 "name": "存储设备名字",
+"terminal_name": "终端名称",
+"storage_id": "设备自定义id",
 "rank": "rank等级(整型)", 
 "room_id": "存储空间id",
 "utype": "存储设备编码类别",
