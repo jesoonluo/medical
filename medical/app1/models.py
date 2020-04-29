@@ -7,17 +7,19 @@ from .helper import now_ts
 
 class room(mongoengine.Document):
     name = mongoengine.StringField(max_length=32)
-    line_order = mongoengine.IntField()                   # 层级
     parent_id = mongoengine.StringField(max_length=32)    # 父级id,只能是房间
+    rank = mongoengine.IntField()                   # 层级
+    roomtype = mongoengine.StringField(max_length=16, default='folder')  # 默认'folder'文件夹
 
 class storage_device(mongoengine.Document):
     # 存储设备(比如冰箱,液氮罐)
     storagename = mongoengine.StringField(max_length=32)
     storagetype = mongoengine.StringField(max_length=16)   #液氮罐 冰箱
+    detailtype = mongoengine.StringField(max_length=16, default='0')    #液氮罐 冰箱 具体类型,没有就是0
     storageline = mongoengine.IntField()
     storagecolumn = mongoengine.IntField()
-    line_order = mongoengine.IntField()                    # 层级
     room_id = mongoengine.StringField(max_length=32)       # 父级id,只能是房间
+    rank = mongoengine.IntField()                    # 层级
 
 class freeze_shelf(mongoengine.Document):
     # 冻存架(放在冰箱里)
@@ -27,6 +29,7 @@ class freeze_shelf(mongoengine.Document):
     shelftype = mongoengine.StringField(max_length=32)     # 冻存架排列方式1-1,11, 2-11,21, 3-A1,B1
     shelfline = mongoengine.IntField()
     shelfecolumn = mongoengine.IntField()
+    rank = mongoengine.IntField()                    # 层级
 
 class freeze_box(mongoengine.Document):
     # 冻存盒(放在冻存架上)
@@ -38,6 +41,7 @@ class freeze_box(mongoengine.Document):
     boxline = mongoengine.IntField()
     boxcolumn = mongoengine.IntField()
     boxnote = mongoengine.GenericEmbeddedDocumentField(default="")
+    rank = mongoengine.IntField()                    # 层级
 
 class log_info(mongoengine.Document):
     operate_table = mongoengine.StringField(max_length=32) # 操作表
@@ -49,7 +53,7 @@ class log_info(mongoengine.Document):
 
 # 暂时不用
 class room_storage_relation():
-    line_order = mongoengine.IntField()                 # 层级
+    rank = mongoengine.IntField()                 # 层级
     uid = mongoengine.StringField(max_length=32)        # 房间或是设备的id
     utype = mongoengine.StringField(max_length=16)      # 房间(room)或是设备(storage)
     parent_id = mongoengine.StringField(max_length=32)  # 父级id,只能是房间
