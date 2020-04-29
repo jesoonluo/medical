@@ -21,7 +21,7 @@ def init_node_room():
         return exist
     new_first_node = room.objects.create(
         name = '全部空间',
-        line_order = 1,                   #层级
+        rank = 1,                   #层级
         parent_id = '0'                   #根节点
     )
     try:
@@ -36,10 +36,10 @@ def init_node_room():
     return new_first_node
 
 
-def add_new_room(name, line_order, parent_id):
+def add_new_room(name, rank, parent_id):
     new_node = room.objects.create(
         name = name,
-        line_order = line_order,
+        rank = rank,
         parent_id = parent_id                  
     )
     try:
@@ -74,13 +74,14 @@ def query_shelf_by_id(shelf_id):
 def query_boxs_by_shelf_id(shelf_id):
     return freeze_box.objects.filter(shelf_id=shelf_id).all()
 
-def add_new_storage(storagename,utype,line_order,room_id, storageline=10, storagecolumn=10):
+def add_new_storage(storagename,utype,dtype,rank,room_id, storageline=10, storagecolumn=10):
     new_store = storage_device(
         storagename = storagename,
         storagetype = utype,
+        detailtype = dtype,
         storageline = storageline,
         storagecolumn = storagecolumn,
-        line_order = line_order,
+        rank = rank,
         room_id = room_id
     )
     try:
@@ -94,13 +95,13 @@ def add_new_storage(storagename,utype,line_order,room_id, storageline=10, storag
         return None
     return str(new_store.id)
 
-def add_new_freeze_shelf(shelfname,utype,line_order,storage_id,shelfline=10,shelfcolumn=10):
+def add_new_freeze_shelf(shelfname,utype,rank,storage_id,shelfline=10,shelfcolumn=10):
     new_shelf = freeze_shelf(
         shelfname = shelfname,
         shelftype = utype,
         shelfline = shelfline,
         shelfcolumn = shelfcolumn,
-        line_order = line_order,
+        rank = rank,
         storageid = storage_id 
     )
     try:
@@ -114,7 +115,7 @@ def add_new_freeze_shelf(shelfname,utype,line_order,storage_id,shelfline=10,shel
         return None
     return str(new_shelf.id)
 
-def add_new_freeze_box(boxname,boxid,utype,boxorder,line_order,shelf_id,box_note,boxline=10,boxcolumn=10):
+def add_new_freeze_box(boxname,boxid,utype,boxorder,rank,shelf_id,box_note,boxline=10,boxcolumn=10):
     new_box = freeze_box(
         boxname = boxname,
         boxid = boxid,         # 冻存盒自定义id
@@ -122,7 +123,7 @@ def add_new_freeze_box(boxname,boxid,utype,boxorder,line_order,shelf_id,box_note
         boxtype = utype,
         boxline = boxline,
         boxcolumn = boxcolumn,
-        line_order = line_order,
+        rank = rank,
         shelf_id = shelf_id, 
         box_note=box_note,     # 冻存盒描述
     )

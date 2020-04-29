@@ -1,2 +1,53 @@
 # medical-
-# 医疗器械展示
+# 查询接口： 
+###  Url:  http://118.24.161.188:8889/query_node
+    
+# .添加存储空间:
+###  Url: http://118.24.161.188:8889/add_room
+###  请求方式: POST
+```json
+Param：{
+“name”: 房间名字, 
+“line_order”: rank等级(整型), 
+“parent_id”: 父节点id
+}
+```
+#.添加存储设备:
+### Url: http://118.24.161.188:8889/add_storage_device
+### 请求方式: POST
+```json
+Param：{
+“name”: 存储空间名字,
+“line_order”: rank等级(整型), 
+“room_id”: 存储空间id，
+”utype”: 存储设备类别
+}
+```
+# 添加冻存架:
+### Url: http://118.24.161.188:8889/add_freeze_shelf
+### 请求方式: POST
+```json
+Param：{
+“name”: 存储空间名字, 
+“line_order”: rank等级(整型), 
+“storage_id”: 存储设备id，
+”utype”: 冻存架类别（‘1’，’2’，’3’）,
+“shelfline”: 冻存架行数(整型), 
+“shelfcolumn”: 冻存架列数(整形)
+}
+```
+#添加冻存盒:
+### Url: http://118.24.161.188:8889/add_freeze_box
+### 请求方式: POST
+```json
+{
+    “name”: 存储空间名字, 
+    “line_order”: rank等级(整型), 
+    “shelf_id”: 冻存架id，
+    ”utype”: 冻存盒类别（‘1’，’2’，’3’）,
+    “boxline”:   冻存盒行数(整型), 
+    “boxcolumn”: 冻存盒列数(整形)，
+    “boxid”：冻存盒自定义id,
+    “boxnote”: 冻存盒描述,
+}
+```

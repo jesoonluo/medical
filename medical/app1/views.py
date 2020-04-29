@@ -18,11 +18,25 @@ def query_all_node(request):
         rst['store'].append({k:v for k,v in mongo_to_dict_helper(first_node).items()})
     else:
         for room in all_room:
-            rst['store'].append({k:v for k,v in mongo_to_dict_helper(room).items()})
+            uroom = {'dtype': '0'}
+            for k,v in mongo_to_dict_helper(room).items():
+                if k != 'roomtype':
+                    uroom[k] = v
+                else:
+                    uroom['utype'] = v
+            rst['store'].append(uroom)
             # 查询room下的设备列表
             all_store = query_storage_device_by_room_id(str(room.id))
             for store in all_store:
-                rst['store'].append({k:v for k,v in mongo_to_dict_helper(store).items()})
+                ustore = {}
+                for k,v in mongo_to_dict_helper(store).items():
+                    if k not in ('storagetype','detailtype'):
+                        ustore[k] = v
+                    elif k == 'storagetype':
+                        ustore['utype'] = v
+                    elif k == 'detailtype':
+                        ustore['dtype'] = v
+                rst['store'].append(ustore)
                 #查询存储设备里的冻存架
     return JsonResponse(rst)
 
@@ -36,7 +50,7 @@ def add_first_room(request):
 
 def add_new_room(request):
     name = request.POST['name']
-    line_order = request.POST['rank']
+    rank = request.POST['rank']
     parent_id = request.POST['parent_id']
     all_room_ids = query_all_room_ids()
     msg = ''
@@ -49,7 +63,7 @@ def add_new_room(request):
          }
          return JsonResponse(rst)
 
-    flag = add_new_room(name, line_order, parent_id)
+    flag = add_new_room(name, rank, parent_id)
     if flag:
          rst = {
              'success': flag,
@@ -70,9 +84,12 @@ def add_new_room(request):
 def add_new_storage_device(request):
     ''' 添加新的设备 '''
     name = request.POST['name']
-    line_order = request.POST['line_order']
+    rank = request.POST['rank']
     room_id = request.POST['room_id']
     utype = request.POST['utype']
+    dtype = request.POST['dtype']
+    storageline = request.POST['storageline']     # 行数
+    storagecolumn = request.POST['storagecolumn'] # 列数
     all_room_ids = query_all_room_ids()
     msg = ''
     if parent_id not in all_room_ids:
@@ -83,7 +100,7 @@ def add_new_storage_device(request):
              'msg': msg
          }
          return JsonResponse(rst)
-    flag = add_new_storage(name,utype,line_order,room_id)
+    flag = add_new_storage(name,utype,rank,room_id,storageline,storagecolumn)
     if flag:
         rst = {
              'success': flag,
@@ -104,7 +121,7 @@ def add_new_storage_device(request):
 def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
     name = request.POST['name']
-    line_order = request.POST['line_order']
+    rank = request.POST['rank']
     shelfline = request.POST['shelfline']     # 行数
     shelfcolumn = request.POST['shelfcolumn'] # 列数
     store_id = request.POST['storage_id']     # 存储设备id
@@ -119,7 +136,7 @@ def add_new_freeze_shelf(request):
              'msg': msg
          }
          return JsonResponse(rst)
-    flag = add_new_freeze_shelf(shelfname,utype,line_order,store_id,shelfline,shelfcolumn)
+    flag = add_new_freeze_shelf(shelfname,utype,rank,store_id,shelfline,shelfcolumn)
     if flag:
         rst = {
              'success': flag,
@@ -140,7 +157,7 @@ def add_new_freeze_shelf(request):
 def add_new_freeze_box(request):
     ''' 添加新的冻存盒 '''
     name = request.POST['name']
-    line_order = request.POST['line_order']
+    rank = request.POST['rank']
     boxline = request.POST['boxline']         # 行数
     boxcolumn = request.POST['boxcolumn']     # 列数
     shelf_id = request.POST['shelf_id']       # 冻存架id
@@ -176,7 +193,7 @@ def add_new_freeze_box(request):
         box_order = en_ch.get(str(num_shang)) + str(num_yu + 1)
     box_id = request.POST.get('boxid', 'system_add_id')
     box_note = request.POST.get('boxnote', 'system_add_note')
-    flag = add_new_freeze_box(name,box_id,utype,box_order,line_order,shelf_id,box_note,boxline,boxcolumn)
+    flag = add_new_freeze_box(name,box_id,utype,box_order,rank,shelf_id,box_note,boxline,boxcolumn)
     if flag:
         rst = {
              'success': flag,
