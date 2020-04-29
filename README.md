@@ -32,7 +32,7 @@ Param：{
 ### 请求方式: POST
 ```json
 Param：{
-"name": "存储空间名字", 
+"name": "冻存架名字", 
 "rank": "rank等级(整型)", 
 "storage_id": "存储设备id",
 "utype": "冻存架类别（‘1’，’2’，’3’)",
@@ -45,7 +45,7 @@ Param：{
 ### 请求方式: POST
 ```json
 {
-    "name": "存储空间名字", 
+    "name": "冻存盒名字", 
     "line_order": "rank等级(整型)", 
     "shelf_id": "冻存架id",
     "utype": "冻存盒类别(‘1’，’2’，’3’)",
