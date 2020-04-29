@@ -20,7 +20,7 @@ Param：{
 "name": "存储空间名字",
 "rank": "rank等级(整型)", 
 "room_id": "存储空间id",
-"utype": "存储设备类别",
+"utype": "存储设备编码类别",
 "dtype": "存储设备详情-立式冰箱,卧式冰箱,或是冻存架类别",
 "storageline": "冰箱行数(整型)", 
 "storagecolumn": "冻存架列数(整型)",
