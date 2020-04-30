@@ -1,6 +1,30 @@
 from .models import room,storage_device,freeze_shelf,freeze_box,log_info
 from bson.objectid import ObjectId
 
+def query_all_room():
+    return room.objects.all()
+
+def query_all_room_ids():
+    return [str(i.id) for i in room.objects.all()]
+
+def query_all_storage_ids():
+    return [str(i.id) for i in storage_device.objects.all()]
+
+def query_storage_device_by_room_id(room_id):
+    return storage_device.objects.filter(room_id=room_id).all()
+
+def query_freeze_shelf_by_store_id(store_id):
+    return freeze_shelf.objects.filter(storageid =store_id).all()
+
+def query_storage_by_id(store_id):
+    return storage_device.objects.get(store_id)
+
+def query_shelf_by_id(shelf_id):
+    return freeze_shelf.objects.get(shelf_id)
+
+def query_boxs_by_shelf_id(shelf_id):
+    return freeze_box.objects.filter(shelf_id=shelf_id).all()
+
 def _insert_log(table, op_type, op_id, desc_id='', desc_text=''):
     log = log_info.objects.create(
         operate_table = table,
@@ -35,7 +59,6 @@ def init_node_room():
         return None
     return new_first_node
 
-
 def add_room(name, rank, parent_id):
     new_node = room.objects.create(
         name = name,
@@ -52,30 +75,6 @@ def add_room(name, rank, parent_id):
         print(e)
         return None
     return str(new_node.id)
-
-def query_all_room():
-    return room.objects.all()
-
-def query_all_room_ids():
-    return [str(i.id) for i in room.objects.all()]
-
-def query_all_storage_ids():
-    return [str(i.id) for i in storage_device.objects.all()]
-
-def query_storage_device_by_room_id(room_id):
-    return storage_device.objects.filter(room_id=room_id).all()
-
-def query_freeze_shelf_by_store_id(store_id):
-    return freeze_shelf.objects.filter(storageid =store_id).all()
-
-def query_storage_by_id(store_id):
-    return storage_device.objects.get(store_id)
-
-def query_shelf_by_id(shelf_id):
-    return freeze_shelf.objects.get(shelf_id)
-
-def query_boxs_by_shelf_id(shelf_id):
-    return freeze_box.objects.filter(shelf_id=shelf_id).all()
 
 def add_new_storage(storagename,terminalname,storageid,utype,dtype,rank,room_id, storageline=10, storagecolumn=10):
     new_store = storage_device(
