@@ -1,4 +1,4 @@
-from .models import room,storage_device,freeze_shelf,freeze_box
+from .models import room,storage_device,freeze_shelf,freeze_box,log_info
 from bson.objectid import ObjectId
 
 def _insert_log(table, op_type, op_id, desc_id='', desc_text=''):
@@ -36,10 +36,10 @@ def init_node_room():
     return new_first_node
 
 
-def add_new_room(name, rank, parent_id):
+def add_room(name, rank, parent_id):
     new_node = room.objects.create(
         name = name,
-        rank = rank,
+        rank = int(rank),
         parent_id = parent_id                  
     )
     try:
@@ -68,20 +68,25 @@ def query_storage_device_by_room_id(room_id):
 def query_freeze_shelf_by_store_id(store_id):
     return freeze_shelf.objects.filter(storageid =store_id).all()
 
+def query_storage_by_id(store_id):
+    return storage_device.objects.get(store_id)
+
 def query_shelf_by_id(shelf_id):
     return freeze_shelf.objects.get(shelf_id)
 
 def query_boxs_by_shelf_id(shelf_id):
     return freeze_box.objects.filter(shelf_id=shelf_id).all()
 
-def add_new_storage(storagename,utype,dtype,rank,room_id, storageline=10, storagecolumn=10):
+def add_new_storage(storagename,terminalname,storageid,utype,dtype,rank,room_id, storageline=10, storagecolumn=10):
     new_store = storage_device(
         storagename = storagename,
+        terminalname = terminalname,
+        storageid = storageid,  # 设备自定义id
         storagetype = utype,
         detailtype = dtype,
         storageline = storageline,
         storagecolumn = storagecolumn,
-        rank = rank,
+        rank = int(rank),
         room_id = room_id
     )
     try:
@@ -95,13 +100,14 @@ def add_new_storage(storagename,utype,dtype,rank,room_id, storageline=10, storag
         return None
     return str(new_store.id)
 
-def add_new_freeze_shelf(shelfname,utype,rank,storage_id,shelfline=10,shelfcolumn=10):
+def add_freeze_shelf(shelfname,utype,shelforder,rank,storage_id,shelfline=10,shelfcolumn=10):
     new_shelf = freeze_shelf(
         shelfname = shelfname,
         shelftype = utype,
+        shelforder = shelforder,
         shelfline = shelfline,
         shelfcolumn = shelfcolumn,
-        rank = rank,
+        rank = int(rank),
         storageid = storage_id 
     )
     try:
@@ -115,7 +121,7 @@ def add_new_freeze_shelf(shelfname,utype,rank,storage_id,shelfline=10,shelfcolum
         return None
     return str(new_shelf.id)
 
-def add_new_freeze_box(boxname,boxid,utype,boxorder,rank,shelf_id,box_note,boxline=10,boxcolumn=10):
+def add_freeze_box(boxname,boxid,utype,boxorder,rank,shelf_id,box_note,boxline=10,boxcolumn=10):
     new_box = freeze_box(
         boxname = boxname,
         boxid = boxid,         # 冻存盒自定义id
@@ -123,7 +129,7 @@ def add_new_freeze_box(boxname,boxid,utype,boxorder,rank,shelf_id,box_note,boxli
         boxtype = utype,
         boxline = boxline,
         boxcolumn = boxcolumn,
-        rank = rank,
+        rank = int(rank),
         shelf_id = shelf_id, 
         box_note=box_note,     # 冻存盒描述
     )

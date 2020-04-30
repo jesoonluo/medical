@@ -13,7 +13,9 @@ class room(mongoengine.Document):
 
 class storage_device(mongoengine.Document):
     # 存储设备(比如冰箱,液氮罐)
+    storageid = mongoengine.StringField(max_length=64)     #设备自定义id
     storagename = mongoengine.StringField(max_length=32)
+    terminalname = mongoengine.StringField(max_length=32)  # 终端名称
     storagetype = mongoengine.StringField(max_length=16)   #液氮罐 冰箱
     detailtype = mongoengine.StringField(max_length=16, default='0')    #液氮罐 冰箱 具体类型,没有就是0
     storageline = mongoengine.IntField()
@@ -40,14 +42,14 @@ class freeze_box(mongoengine.Document):
     boxtype = mongoengine.StringField(max_length=32)       
     boxline = mongoengine.IntField()
     boxcolumn = mongoengine.IntField()
-    boxnote = mongoengine.GenericEmbeddedDocumentField(default="")
+    boxnote = mongoengine.StringField(max_length=256, default="")
     rank = mongoengine.IntField()                    # 层级
 
 class log_info(mongoengine.Document):
     operate_table = mongoengine.StringField(max_length=32) # 操作表
     operate_type = mongoengine.StringField(max_length=16)  # 操作类别add, delete, update
     operate_id = mongoengine.StringField(max_length=64)    # 操作对象的id
-    operate_desc = mongoengine.GenericEmbeddedDocumentField(default="")   # 操作描述
+    operate_desc = mongoengine.StringField(max_length=256, default="")
     destination_id = mongoengine.StringField(max_length=64, default="")   # 目的id,update时候用
     dt_create = mongoengine.DateTimeField(now_ts())
 

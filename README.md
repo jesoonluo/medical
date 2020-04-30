@@ -9,7 +9,7 @@
 Param：{
 "name": "房间名字", 
 "rank": "rank等级(整型)", 
-"room_id": "父节点id"
+"parent_id": "父节点id"
 }
 ```
 # 添加存储设备:
@@ -21,7 +21,7 @@ Param：{
 "terminal_name": "终端名称",
 "storage_id": "设备自定义id",
 "rank": "rank等级(整型)", 
-"room_id": "存储空间id",
+"parent_id": "存储空间id",
 "utype": "存储设备编码类别",
 "dtype": "存储设备详情-立式冰箱,卧式冰箱,或是冻存架类别",
 "storageline": "冰箱行数(整型)", 
@@ -36,7 +36,7 @@ Param：{
 Param：{
 "name": "冻存架名字", 
 "rank": "rank等级(整型)", 
-"storage_id": "存储设备id",
+"parent_id": "存储设备id",
 "utype": "冻存架类别（‘1’，’2’，’3’)",
 "shelfline": "冻存架行数(整型)", 
 "shelfcolumn": "冻存架列数(整型)"
@@ -48,8 +48,8 @@ Param：{
 ```json
 {
     "name": "冻存盒名字", 
-    "line_order": "rank等级(整型)", 
-    "shelf_id": "冻存架id",
+    "rank": "rank等级(整型)", 
+    "parent_id": "冻存架id",
     "utype": "冻存盒类别(‘1’，’2’，’3’)",
     "boxline": "冻存盒行数(整型)", 
     "boxcolumn": "冻存盒列数(整形)",

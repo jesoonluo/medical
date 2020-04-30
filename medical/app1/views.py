@@ -40,22 +40,23 @@ def query_all_node(request):
             for store in all_store:
                 ustore = {}
                 for k,v in mongo_to_dict_helper(store).items():
-                    if k not in ('storagetype','detailtype'):
+                    if k not in ('storagetype','detailtype','room_id'):
                         ustore[k] = v
                     elif k == 'storagetype':
                         ustore['utype'] = v
                     elif k == 'detailtype':
                         ustore['dtype'] = v
+                    elif k == 'room_id':
+                        ustore['parent_id'] = v
                 rst['store'].append(ustore)
                 #查询存储设备里的冻存架
     return JsonResponse(rst)
 
 @csrf_exempt
 def add_new_room(request):
-    print('*'*10, dict(request.POST))
     name = request.POST['name']
     rank = request.POST['rank']
-    parent_id = request.POST['room_id']
+    parent_id = request.POST['parent_id']
     all_room_ids = query_all_room_ids()
     msg = ''
     if parent_id not in all_room_ids:
@@ -67,7 +68,7 @@ def add_new_room(request):
          }
          return JsonResponse(rst)
 
-    flag = add_new_room(name, rank, parent_id)
+    flag = add_room(name, rank, parent_id)
     if flag:
          rst = {
              'success': flag,
@@ -88,16 +89,19 @@ def add_new_room(request):
 @csrf_exempt
 def add_new_storage_device(request):
     ''' 添加新的设备 '''
+    print('*'*10, dict(request.POST))
     name = request.POST['name']
+    terminalname = request.POST['terminal_name']
+    storageid = request.POST['storage_id']
     rank = request.POST['rank']
-    room_id = request.POST['room_id']
+    room_id = request.POST['parent_id']
     utype = request.POST['utype']
     dtype = request.POST['dtype']
     storageline = request.POST['storageline']     # 行数
     storagecolumn = request.POST['storagecolumn'] # 列数
     all_room_ids = query_all_room_ids()
     msg = ''
-    if parent_id not in all_room_ids:
+    if room_id not in all_room_ids:
          msg = u'存储空间不存在,请确认'
          rst = {
              'success': False,
@@ -105,7 +109,7 @@ def add_new_storage_device(request):
              'msg': msg
          }
          return JsonResponse(rst)
-    flag = add_new_storage(name,utype,rank,room_id,storageline,storagecolumn)
+    flag = add_new_storage(name,terminalname,storageid,utype,dtype,rank,room_id,storageline,storagecolumn)
     if flag:
         rst = {
              'success': flag,
@@ -130,19 +134,38 @@ def add_new_freeze_shelf(request):
     rank = request.POST['rank']
     shelfline = request.POST['shelfline']     # 行数
     shelfcolumn = request.POST['shelfcolumn'] # 列数
-    store_id = request.POST['storage_id']     # 存储设备id
+    store_id = request.POST['parent_id']     # 存储设备id
     utype = request.POST['utype']             # 冻存架排列方式(1,2,3)
-    all_storage_ids = query_all_storage_ids()
     msg = ''
-    if store_id not in all_storage_ids :
-         msg = u'存储空间不存在,请确认'
+    storage = query_storage_by_id(store_id)
+    if not storage:
+         msg = u'存储设备不存在,请确认'
          rst = {
              'success': False,
              'code': 304,
              'msg': msg
          }
          return JsonResponse(rst)
-    flag = add_new_freeze_shelf(shelfname,utype,rank,store_id,shelfline,shelfcolumn)
+    # 获取已经存在的冻存架数
+    shelfs = query_freeze_shelf_by_store_id(store_id)
+    # TODO根据冻存架type,确定排列位子
+    shelf_order = ''
+    if storage.utype == '1': #1,2,3...,11
+        shelf_order = len(shelfs) + 1
+    elif storage.utype == '2':   #11,21,31
+        num_shang = len(shelfs)//storage.storageline
+        num_yu = len(shelfs)%storage.storageline
+        if num_yu == 0:
+            shelf_order = str(num_shang+1) + str(1)
+        shelf_order = str(num_shang) + str(num_yu + 1)
+    elif storage.utype == '3':   #11,21,31
+        en_ch = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H', '9': 'I', '10': 'J', '11': 'K', '12': 'L', '13': 'M', '14': 'N'}
+        num_shang = len(shelfs)//storage.storageline
+        num_yu = len(shelfs)%storage.storageline
+        if num_yu == 0:
+            shelf_order = en_ch.get(str(num_shang+1)) + str(1)
+        shelf_order = en_ch.get(str(num_shang)) + str(num_yu + 1)
+    flag = add_freeze_shelf(shelfname,utype,shelf_order,rank,store_id,shelfline,shelfcolumn)
     if flag:
         rst = {
              'success': flag,
@@ -167,7 +190,7 @@ def add_new_freeze_box(request):
     rank = request.POST['rank']
     boxline = request.POST['boxline']         # 行数
     boxcolumn = request.POST['boxcolumn']     # 列数
-    shelf_id = request.POST['shelf_id']       # 冻存架id
+    shelf_id = request.POST['parent_id']       # 冻存架id
     utype = request.POST['utype']             # 冻存盒排列方式(1,2,3)
     msg = ''
     shelf = query_shelf_by_id(shelf_id)
@@ -200,7 +223,7 @@ def add_new_freeze_box(request):
         box_order = en_ch.get(str(num_shang)) + str(num_yu + 1)
     box_id = request.POST.get('boxid', 'system_add_id')
     box_note = request.POST.get('boxnote', 'system_add_note')
-    flag = add_new_freeze_box(name,box_id,utype,box_order,rank,shelf_id,box_note,boxline,boxcolumn)
+    flag = add_freeze_box(name,box_id,utype,box_order,rank,shelf_id,box_note,boxline,boxcolumn)
     if flag:
         rst = {
              'success': flag,
