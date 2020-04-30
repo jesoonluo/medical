@@ -18,6 +18,9 @@ def check_login(func):
             return HttpResponseRedirect("/login")
     return inner
 
+def index(request):
+    return render(request, 'public/index.html')
+    
 #@check_login
 def query_all_node(request):
     ''' 获取所有节点 '''

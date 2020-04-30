@@ -9,4 +9,5 @@ urlpatterns = [
     path('add_storage_device',views.add_new_storage_device),
     path('add_freeze_shelf',views.add_new_freeze_shelf),
     path('add_freeze_box',views.add_new_freeze_box),
+    path('index/',views.index),
 ]
