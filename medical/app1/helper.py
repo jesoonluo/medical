@@ -32,7 +32,7 @@ def query_code_name_by_type(idx, code_method, line, column, storage):
         length = min(line, column)
     elif storage == 'fridge2':
         length = max(line, column)
-    elif storage.startwith("yedanguan"):
+    elif storage.startswith("yedanguan"):
         return idx + 1
     if code_method == '1': #1,2,3...,11
         code_name = idx + 1
@@ -55,6 +55,18 @@ def query_code_name_by_type(idx, code_method, line, column, storage):
 def format_storage_list(code_method, line, column, storage, parent_id, utable):
     rst = []    
     exist_item = 0
+    if storage.startswith("yedanguan"):
+        for i in range(column):
+            foo = {}
+            code_name = query_code_name_by_type(i, code_method, line, column, storage)
+            foo['name'] = code_name
+            exist_child = query_item_by_code_by_id(utable, parent_id, code_name)
+            if exist_child:
+                exist_item += 1
+                foo['id'] = exist_child['id']
+                foo['percent'] = 0
+            rst.append(foo)
+        return rst
     for i in range(int(line)):
         foo_list = []
         for j in range(int(column)):

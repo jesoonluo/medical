@@ -99,10 +99,10 @@ def add_storage_N2(request):
     storageid = request.POST['storage_id']
     rank = request.POST['rank']
     room_id = request.POST['parent_id']
-    utype = request.POST['utype']         # 液氮罐编码方式默认为1??
+    utype = request.POST.get('utype','1')         # 液氮罐编码方式默认为1?
     dtype = request.POST['dtype']
-    storageline = request.POST['num']     # 冻存架数量
-    storagecolumn = 1                     # 列数 (默认为1)
+    storageline = 1                               # 冻存架数量
+    storagecolumn = request.POST['num']           # 列数 (默认为1)
     all_room_ids = query_all_room_ids()
     msg = ''
     if room_id not in all_room_ids:

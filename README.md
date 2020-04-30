@@ -39,8 +39,9 @@ Param：{
 "storage_id": "设备自定义id",
 "rank": "rank等级(整型)", 
 "parent_id": "存储空间id",
-"utype": "液氮罐编码类别",
+"utype": "液氮罐编码类别(默认1)",
 "dtype": "液氮罐类别",
+"num": "冻存架数量"
 }
 ```
 
