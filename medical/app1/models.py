@@ -1,9 +1,14 @@
 import mongoengine
 import datetime
 from django.db import models
-from .helper import now_ts
+import pytz
+from datetime import datetime
 
 # Create your models here.
+def now_ts(lite=False):
+    if lite:
+        return datetime.now(pytz.timezone('Asia/Shanghai')).strftime('%Y%m%d%H%M%S')
+    return datetime.now(pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 
 class room(mongoengine.Document):
     name = mongoengine.StringField(max_length=32)
@@ -26,7 +31,7 @@ class storage_device(mongoengine.Document):
 class freeze_shelf(mongoengine.Document):
     # 冻存架(放在冰箱里)
     storageid = mongoengine.StringField(max_length=64)     #设备id
-    shelforder = mongoengine.IntField()                    # 顺序号(用于存储冻存架的顺序)
+    shelforder = mongoengine.StringField(max_length=16)                    # 顺序号(用于存储冻存架的顺序)
     shelfname = mongoengine.StringField(max_length=32)
     shelftype = mongoengine.StringField(max_length=32)     # 冻存架排列方式1-1,11, 2-11,21, 3-A1,B1
     shelfline = mongoengine.IntField()
@@ -36,7 +41,7 @@ class freeze_shelf(mongoengine.Document):
 class freeze_box(mongoengine.Document):
     # 冻存盒(放在冻存架上)
     shelfid = mongoengine.StringField(max_length=64)       #冻存架id
-    boxorder = mongoengine.IntField()                      #顺序号(用于存储冻存架的顺序)
+    boxorder = mongoengine.StringField(max_length=16)                      #顺序号(用于存储冻存架的顺序)
     boxfname = mongoengine.StringField(max_length=32)
     boxid = mongoengine.StringField(max_length=32)         #冻存盒自定义id
     boxtype = mongoengine.StringField(max_length=32)       
@@ -59,3 +64,5 @@ class room_storage_relation():
     uid = mongoengine.StringField(max_length=32)        # 房间或是设备的id
     utype = mongoengine.StringField(max_length=16)      # 房间(room)或是设备(storage)
     parent_id = mongoengine.StringField(max_length=32)  # 父级id,只能是房间
+
+

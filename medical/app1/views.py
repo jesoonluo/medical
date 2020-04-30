@@ -42,6 +42,8 @@ def query_all_node(request):
             all_store = query_storage_device_by_room_id(str(room.id))
             for store in all_store:
                 ustore = {}
+                format_list = format_storage_list(store.storagetype , store.storageline, store.storagecolumn, store.detailtype, store.id, 'storage')
+                ustore['fridge'] = format_list
                 for k,v in mongo_to_dict_helper(store).items():
                     if k not in ('storagetype','detailtype','room_id'):
                         ustore[k] = v
@@ -88,6 +90,45 @@ def add_new_room(request):
          }
          return JsonResponse(rst)
 
+@csrf_exempt
+def add_storage_N2(request):
+    ''' 添加液氮罐 '''
+    print('*'*10, dict(request.POST))
+    name = request.POST['name']
+    terminalname = ''
+    storageid = request.POST['storage_id']
+    rank = request.POST['rank']
+    room_id = request.POST['parent_id']
+    utype = request.POST['utype']         # 液氮罐编码方式默认为1??
+    dtype = request.POST['dtype']
+    storageline = request.POST['num']     # 冻存架数量
+    storagecolumn = 1                     # 列数 (默认为1)
+    all_room_ids = query_all_room_ids()
+    msg = ''
+    if room_id not in all_room_ids:
+         msg = u'存储空间不存在,请确认'
+         rst = {
+             'success': False,
+             'code': 304,
+             'msg': msg
+         }
+         return JsonResponse(rst)
+    flag = add_new_storage(name,terminalname,storageid,utype,dtype,rank,room_id,storageline,storagecolumn)
+    if flag:
+        rst = {
+             'success': flag,
+             'code': 200,
+             'msg': msg
+        }
+        return JsonResponse(rst)
+    else:
+         msg = u'创建失败，数据库错误'
+         rst = {
+             'success': False,
+             'code': 301,
+             'msg': msg
+         }
+         return JsonResponse(rst)
 
 @csrf_exempt
 def add_new_storage_device(request):
@@ -152,22 +193,7 @@ def add_new_freeze_shelf(request):
     # 获取已经存在的冻存架数
     shelfs = query_freeze_shelf_by_store_id(store_id)
     # TODO根据冻存架type,确定排列位子
-    shelf_order = ''
-    if storage.utype == '1': #1,2,3...,11
-        shelf_order = len(shelfs) + 1
-    elif storage.utype == '2':   #11,21,31
-        num_shang = len(shelfs)//storage.storageline
-        num_yu = len(shelfs)%storage.storageline
-        if num_yu == 0:
-            shelf_order = str(num_shang+1) + str(1)
-        shelf_order = str(num_shang) + str(num_yu + 1)
-    elif storage.utype == '3':   #11,21,31
-        en_ch = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H', '9': 'I', '10': 'J', '11': 'K', '12': 'L', '13': 'M', '14': 'N'}
-        num_shang = len(shelfs)//storage.storageline
-        num_yu = len(shelfs)%storage.storageline
-        if num_yu == 0:
-            shelf_order = en_ch.get(str(num_shang+1)) + str(1)
-        shelf_order = en_ch.get(str(num_shang)) + str(num_yu + 1)
+    shelf_order = query_code_name_by_type(len(shelfs), storage.utype, storage.storageline, storage.storagecolumn, storage.detailtype )
     flag = add_freeze_shelf(shelfname,utype,shelf_order,rank,store_id,shelfline,shelfcolumn)
     if flag:
         rst = {
@@ -208,22 +234,7 @@ def add_new_freeze_box(request):
     # 获取已经存在的冻存盒数
     boxs = query_boxs_by_shelf_id(shelf_id)
     # TODO根据冻存架type,确定排列位子
-    box_order = ''
-    if shelf.utype == '1': #1,2,3...,11
-        box_order = len(boxs) + 1
-    elif shelf.utype == '2':   #11,21,31
-        num_shang = len(boxs)//shelf.shelfline
-        num_yu = len(boxs)%shelf.shelfline
-        if num_yu == 0:
-            box_order = str(num_shang+1) + str(1)
-        box_order = str(num_shang) + str(num_yu + 1)
-    elif shelf.utype == '3':   #11,21,31
-        en_ch = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H', '9': 'I', '10': 'J', '11': 'K', '12': 'L', '13': 'M', '14': 'N'}
-        num_shang = len(boxs)//shelf.shelfline
-        num_yu = len(boxs)%shelf.shelfline
-        if num_yu == 0:
-            box_order = en_ch.get(str(num_shang+1)) + str(1)
-        box_order = en_ch.get(str(num_shang)) + str(num_yu + 1)
+    box_order = query_code_name_by_type(len(boxs), shelf.utype, shelf.shelfline, shelf.shelfcolumn, 'box')
     box_id = request.POST.get('boxid', 'system_add_id')
     box_note = request.POST.get('boxnote', 'system_add_note')
     flag = add_freeze_box(name,box_id,utype,box_order,rank,shelf_id,box_note,boxline,boxcolumn)

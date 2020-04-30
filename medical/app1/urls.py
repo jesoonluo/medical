@@ -7,6 +7,7 @@ urlpatterns = [
     path('query_node',views.query_all_node),
     path('add_room',views.add_new_room),
     path('add_storage_device',views.add_new_storage_device),
+    path('add_storage_N2',views.add_storage_N2),
     path('add_freeze_shelf',views.add_new_freeze_shelf),
     path('add_freeze_box',views.add_new_freeze_box),
     path('index/',views.index),

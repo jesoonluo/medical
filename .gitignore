@@ -1,4 +1,5 @@
 *.pyc
+*.out
 **/migrations/**
 **/__pycache__/**
 **/scripts/**

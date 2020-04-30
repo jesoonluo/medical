@@ -1,11 +1,6 @@
-import pytz
 from mongoengine import StringField,FloatField,IntField,ListField,ObjectIdField
-from datetime import datetime
+from .db import query_item_by_code_by_id
 
-def now_ts(lite=False):
-    if lite:
-        return datetime.now(pytz.timezone('Asia/Shanghai')).strftime('%Y%m%d%H%M%S')
-    return datetime.now(pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 
 def mongo_to_dict_helper(obj):
     return_data = []
@@ -27,3 +22,59 @@ def mongo_to_dict_helper(obj):
             # You can define your logic for returning elements
             pass
     return dict(return_data)
+
+def query_code_name_by_type(idx, code_method, line, column, storage):
+    # 立式冰箱
+    code_name = ''
+    en_ch = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H', '9': 'I', '10': 'J', '11': 'K', '12': 'L', '13': 'M', '14': 'N'}
+    length = line
+    if storage == 'fridge1':
+        length = min(line, column)
+    elif storage == 'fridge2':
+        length = max(line, column)
+    elif storage.startwith("yedanguan"):
+        return idx + 1
+    if code_method == '1': #1,2,3...,11
+        code_name = idx + 1
+    elif code_method == '2':   #11,21,31
+        # 立式冰箱
+        num_shang = idx//length + 1
+        num_yu = idx%length + 1
+        if num_yu == 0:
+            code_name = str(num_shang) + str(1)
+        code_name = str(num_shang) + str(num_yu)
+    elif code_method  == '3':   #11,21,31
+        num_shang = idx//length + 1
+        num_yu = idx%length + 1
+        if num_yu == 0:
+            code_name = en_ch.get(str(num_shang)) + str(1)
+        code_name = en_ch.get(str(num_shang)) + str(num_yu)
+    return code_name
+        
+
+def format_storage_list(code_method, line, column, storage, parent_id, utable):
+    rst = []    
+    exist_item = 0
+    for i in range(int(line)):
+        foo_list = []
+        for j in range(int(column)):
+            foo = {}
+            code_name = query_code_name_by_type(i*int(column)+j, code_method, line, column, storage)
+            foo['name'] = code_name
+            #添加具体信息
+            exist_child = query_item_by_code_by_id(utable, parent_id, code_name)
+            if exist_child:
+                exist_item += 1
+                foo['id'] = exist_child['id']
+                foo['percent'] = 0
+            foo_list.append(foo)
+        rst.append(foo_list)
+    return rst
+        
+
+
+
+
+
+
+   

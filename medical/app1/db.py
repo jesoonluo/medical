@@ -142,3 +142,9 @@ def add_freeze_box(boxname,boxid,utype,boxorder,rank,shelf_id,box_note,boxline=1
         print(e)
         return None
     return str(new_box.id)
+
+def query_item_by_code_by_id(utable, parent_id, code_name):
+    if utable == 'storage':
+        return freeze_shelf.objects.filter(storageid=parent_id).filter(shelforder=code_name).first()
+    elif utable == 'shelf':
+        return freeze_box.objects.filter(shelf_id=parent_id).filter(boxorder=code_name).first()

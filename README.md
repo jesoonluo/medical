@@ -12,6 +12,7 @@ Param：{
 "parent_id": "父节点id"
 }
 ```
+
 # 添加存储设备:
 ### Url: http://118.24.161.188:8889/add_storage_device
 ### 请求方式: POST
@@ -29,6 +30,20 @@ Param：{
 }
 ```
 
+# 添加液氮罐:
+### Url: http://118.24.161.188:8889/add_storage_N2
+### 请求方式: POST
+```json
+Param：{
+"name": "存储设备名字",
+"storage_id": "设备自定义id",
+"rank": "rank等级(整型)", 
+"parent_id": "存储空间id",
+"utype": "液氮罐编码类别",
+"dtype": "液氮罐类别",
+}
+```
+
 # 添加冻存架:
 ### Url: http://118.24.161.188:8889/add_freeze_shelf
 ### 请求方式: POST
@@ -42,6 +57,7 @@ Param：{
 "shelfcolumn": "冻存架列数(整型)"
 }
 ```
+
 # 添加冻存盒:
 ### Url: http://118.24.161.188:8889/add_freeze_box
 ### 请求方式: POST
