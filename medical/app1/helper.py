@@ -52,6 +52,24 @@ def query_code_name_by_type(idx, code_method, line, column, storage):
     return code_name
         
 
+def format_shelf_list(code_method, line, column, shelf_id):
+    code_list = [i for i in range(int(line)*int(column))]
+    reverse_list = sorted(code_list,reverse=True)
+    rst = []
+    for i in range(int(line)*int(column)):
+        foo = {}
+        foo['percent'] = 0
+        if code_method == '1':
+            code_name = str(i)
+        elif code_method == '2':
+            code_name = str(reverse_list(i))
+        foo['name'] = code_name
+        exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(code_name))
+        if exist_child:
+            foo['id'] = str(exist_child['id'])
+        rst.append(foo)
+    return rst
+
 def format_storage_list(code_method, line, column, storage, parent_id, utable):
     rst = []    
     exist_item = 0
@@ -60,12 +78,13 @@ def format_storage_list(code_method, line, column, storage, parent_id, utable):
             foo = {}
             code_name = query_code_name_by_type(i, code_method, line, column, storage)
             foo['name'] = code_name
-            exist_child = query_item_by_code_by_id(utable, parent_id, code_name)
+            exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name))
             foo['percent'] = 0
             if exist_child:
                 exist_item += 1
-                foo['id'] = exist_child['id']
-                foo['percent'] = _get_percent(exist_child, utable)
+                foo['id'] = str(exist_child['id'])
+                #foo['percent'] = _get_percent(exist_child, utable)
+                foo['percent'] = 1
             rst.append(foo)
         return rst
     for i in range(int(line)):
@@ -75,12 +94,12 @@ def format_storage_list(code_method, line, column, storage, parent_id, utable):
             code_name = query_code_name_by_type(i*int(column)+j, code_method, line, column, storage)
             foo['name'] = code_name
             #添加具体信息
-            exist_child = query_item_by_code_by_id(utable, parent_id, code_name)
+            exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name))
             foo['percent'] = 0
             if exist_child:
                 exist_item += 1
-                foo['id'] = exist_child['id']
-                foo['percent'] = _get_percent(exist_child, utable)
+                foo['id'] = str(exist_child['id'])
+                foo['percent'] = 1
             foo_list.append(foo)
         rst.append(foo_list)
     return rst

@@ -1,7 +1,9 @@
-# medical-
 # 查询接口： 
 ###  Url:  http://118.24.161.188:8889/query_node
     
+# 查寻冻存架： 
+###  Url:  http://118.24.161.188:8889/query_shelfs?uid=设备id
+
 # 添加存储空间:
 ###  Url: http://118.24.161.188:8889/add_room
 ###  请求方式: POST

@@ -78,6 +78,27 @@ def query_all_node(request):
                 #查询存储设备里的冻存架
     return JsonResponse(rst)
 
+def query_shelf_by_storage_id(request):
+    ''' 获取所有节点 '''
+    storage_id = request.POST['uid']
+    freeze_shelfs = query_freeze_shelf_by_store_id(storage_id)
+    rst = []
+    for shelf in freeze_shelfs:
+        foo = {}
+        format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
+        foo['shelf'] = format_list
+        for k,v in mongo_to_dict_helper(store).items():
+            if k not in ('shelftype','detailtype','storageid'):
+                ustore[k] = v
+            elif k == 'shelftype':
+                ustore['utype'] = v
+            elif k == 'detailtype':
+                ustore['dtype'] = v
+            elif k == 'storageid ':
+                ustore['parent_id'] = v
+        rst.append(foo)
+    return JsonResponse(rst)
+
 @csrf_exempt
 def add_new_room(request):
     name = request.POST['name']
@@ -195,7 +216,8 @@ def add_new_storage_device(request):
 @csrf_exempt
 def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
-    name = request.POST['name']
+    print('*'*10, dict(request.POST))
+    shelfname = request.POST['name']
     rank = request.POST['rank']
     shelfline = request.POST['shelfline']     # 行数
     shelfcolumn = request.POST['shelfcolumn'] # 列数
