@@ -175,15 +175,17 @@ def add_new_storage(storagename,terminalname,storageid,utype,dtype,rank,room_id,
         return None
     return str(new_store.id)
 
-def add_freeze_shelf(shelfname,utype,shelforder,rank,storage_id,shelfline=10,shelfcolumn=10):
+def add_freeze_shelf(shelfname,utype,dtype,shelforder,rank,storage_id,hands_direction,shelfline=10,shelfcolumn=10):
     new_shelf = freeze_shelf(
         shelfname = shelfname,
         shelftype = utype,
+        detailtype = dtype,
         shelforder = shelforder,
         shelfline = shelfline,
         shelfcolumn = shelfcolumn,
         rank = int(rank),
-        storageid = storage_id 
+        storageid = storage_id,
+        hands_direction=hands_direction
     )
     try:
         new_shelf.save()

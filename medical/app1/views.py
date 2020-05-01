@@ -199,8 +199,12 @@ def add_new_freeze_shelf(request):
     rank = request.POST['rank']
     shelfline = request.POST['shelfline']     # 行数
     shelfcolumn = request.POST['shelfcolumn'] # 列数
-    store_id = request.POST['parent_id']     # 存储设备id
-    utype = request.POST['utype']             # 冻存架排列方式(1,2,3)
+    store_id = request.POST['parent_id']      # 存储设备id
+    hands_direction = request.POST['hands_direction']  # 拉手方向
+    utype = request.POST['utype']             # 冻存架排列方式(1->正序,2->逆序)
+    dtype = request.POST['dtype']             # 冻存架类别
+    shelf_order = request.POST['shelf_order'] # 编号,设备上的编号
+    #TODO 验证编号和设备的编码方式是否一致
     msg = ''
     storage = query_storage_by_id(store_id)
     if not storage:
@@ -212,10 +216,10 @@ def add_new_freeze_shelf(request):
          }
          return JsonResponse(rst)
     # 获取已经存在的冻存架数
-    shelfs = query_freeze_shelf_by_store_id(store_id)
+    #shelfs = query_freeze_shelf_by_store_id(store_id)
     # TODO根据冻存架type,确定排列位子
-    shelf_order = query_code_name_by_type(len(shelfs), storage.utype, storage.storageline, storage.storagecolumn, storage.detailtype )
-    flag = add_freeze_shelf(shelfname,utype,shelf_order,rank,store_id,shelfline,shelfcolumn)
+    # shelf_order = query_code_name_by_type(len(shelfs), storage.utype, storage.storageline, storage.storagecolumn, storage.detailtype )
+    flag = add_freeze_shelf(shelfname,utype,dtype,shelf_order,rank,store_id,hands_direction,shelfline,shelfcolumn)
     if flag:
         rst = {
              'success': flag,

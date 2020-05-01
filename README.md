@@ -18,7 +18,7 @@ Param：{
 ###  请求方式: POST
 ```json
 Param：{
-   "uid": "要删除的id",  #有内容的空间不能删除(后端判定),
+   "uid": "要删除的id,有内容的空间不能删除(后端判定)",
    "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
 }
 ```
@@ -74,9 +74,11 @@ Param：{
 "name": "冻存架名字", 
 "rank": "rank等级(整型)", 
 "parent_id": "存储设备id",
-"utype": "冻存架类别（‘1’，’2’，’3’)",
+"utype": "冻存架类别（‘1’->正序，’2’->逆序)",
+"dtype": "冻存架类别",
 "shelfline": "冻存架行数(整型)", 
-"shelfcolumn": "冻存架列数(整型)"
+"shelfcolumn": "冻存架列数(整型)",
+"hands_direction": "拉手方向"
 }
 ```
 

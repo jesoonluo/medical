@@ -30,10 +30,12 @@ class storage_device(mongoengine.Document):
 
 class freeze_shelf(mongoengine.Document):
     # 冻存架(放在冰箱里)
-    storageid = mongoengine.StringField(max_length=64)     #设备id
-    shelforder = mongoengine.StringField(max_length=16)                    # 顺序号(用于存储冻存架的顺序)
+    storageid = mongoengine.StringField(max_length=64)       # 设备id
+    shelforder = mongoengine.StringField(max_length=16)      # 顺序号(用于存储冻存架的顺序)
     shelfname = mongoengine.StringField(max_length=32)
-    shelftype = mongoengine.StringField(max_length=32)     # 冻存架排列方式1-1,11, 2-11,21, 3-A1,B1
+    hands_direction = mongoengine.StringField(max_length=16) # 拉手方向
+    shelftype = mongoengine.StringField(max_length=32)       # 冻存架排列方式两种(正序,逆序)
+    detailtype = mongoengine.StringField(max_length=16, default='0')    #冻存架类别(立式)
     shelfline = mongoengine.IntField()
     shelfecolumn = mongoengine.IntField()
     rank = mongoengine.IntField()                    # 层级
