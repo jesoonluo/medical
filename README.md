@@ -62,7 +62,6 @@ Param：{
 "parent_id": "存储空间id",
 "utype": "液氮罐编码类别(默认1)",
 "dtype": "液氮罐类别",
-"shelf_order": "设备位子,A1",
 "num": "冻存架数量"
 }
 ```
@@ -79,6 +78,7 @@ Param：{
 "dtype": "冻存架类别",
 "shelfline": "冻存架行数(整型)", 
 "shelfcolumn": "冻存架列数(整型)",
+"shelf_order": "设备位子,A1",
 "hands_direction": "拉手方向"
 }
 ```
