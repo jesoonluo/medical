@@ -61,10 +61,11 @@ def format_storage_list(code_method, line, column, storage, parent_id, utable):
             code_name = query_code_name_by_type(i, code_method, line, column, storage)
             foo['name'] = code_name
             exist_child = query_item_by_code_by_id(utable, parent_id, code_name)
+            foo['percent'] = 0
             if exist_child:
                 exist_item += 1
                 foo['id'] = exist_child['id']
-                foo['percent'] = 0
+                foo['percent'] = _get_percent(exist_child, utable)
             rst.append(foo)
         return rst
     for i in range(int(line)):
@@ -75,15 +76,23 @@ def format_storage_list(code_method, line, column, storage, parent_id, utable):
             foo['name'] = code_name
             #添加具体信息
             exist_child = query_item_by_code_by_id(utable, parent_id, code_name)
+            foo['percent'] = 0
             if exist_child:
                 exist_item += 1
                 foo['id'] = exist_child['id']
-                foo['percent'] = 0
+                foo['percent'] = _get_percent(exist_child, utable)
             foo_list.append(foo)
         rst.append(foo_list)
     return rst
         
-
+def _get_percent(obj, utable):
+    if utable == 'storage':
+        all_items = obj.shelfline*obj.shelfcolumn
+        exist_items = len(freeze_shelf.objects.filter(storageid=obj.id).all())
+    elif utable == 'shelf':
+        all_items = obj.boxline*obj.boxcolumn
+        exist_items = len(freeze_box.objects.filter(shelfid=obj.id).all())
+    return round(exist_items/all_items*100)
 
 
 
