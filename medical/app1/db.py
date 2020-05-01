@@ -59,6 +59,82 @@ def init_node_room():
         return None
     return new_first_node
 
+def delete_unit(uid, dtype):
+    #判断该room下是否存在别的空间或是存储设备
+    if dtype == 'folder':
+        child_room = room.objects.filter(parent_id=uid).all()
+        child_storage = storage_device.objects.filter(room_id=uid).all()
+        if child_room or child_storage:
+             return {'success': False, 'msg': u'该空间下存在未删除子集', 'code': 302}
+        try:
+            room.objects.get(uid).delete()
+            log = _insert_log('room', 'delete', str(uid))
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'删除失败,数据库错误', 'code': 301}
+    elif dtype == 'storage':
+        child_shelf = freeze_shelf.objects.filter(storageid=uid).all()
+        if child_shelf:
+             return {'success': False, 'msg': u'该空间下存在未删除子集', 'code': 302}
+        try:
+            storage_device.objects.get(uid).delete()
+            log = _insert_log('storage_device', 'delete', str(uid))
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'删除失败,数据库错误', 'code': 301}
+    elif dtype == 'freeze_shelf':
+        child_shelf = freeze_box.objects.filter(shelfid=uid).all()
+        if child_shelf:
+             return {'success': False, 'msg': u'该空间下存在未删除子集', 'code': 302}
+        try:
+            freeze_shelf.objects.get(uid).delete()
+            log = _insert_log('freeze_shelf', 'delete', str(uid))
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'删除失败,数据库错误', 'code': 301}
+
+def update_unit(uid, new_parent_id, dtype):
+    #判断该room下是否存在别的空间或是存储设备
+    if dtype == 'folder':
+        uparent = room.objects.get(new_parent_id)
+        if not uparent:
+             return {'success': False, 'msg': u'新父节点不存在', 'code': 302}
+        try:
+            room_obj = room.objects.get(uid)
+            room_obj.update({"parent_id": new_parent_id})
+            room_obj.save()
+            log = _insert_log('room', 'update', str(uid), str(new_parent_id))
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'迁移失败,数据库错误', 'code': 301}
+    elif dtype == 'storage':
+        uroom = room.objects.get(new_parent_id)
+        if not uroom:
+             return {'success': False, 'msg': u'空间不存在', 'code': 302}
+        try:
+            storage_obj = storage_device.objects.get(uid)
+            storage_obj.update({"room_id": new_parent_id})
+            storage_obj.save()
+            log = _insert_log('storage_device', 'update', str(uid), str(new_parent_id))
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'迁移失败,数据库错误', 'code': 301}
+    elif dtype == 'freeze_shelf':
+        ustorage = storage_device.objects.get(new_parent_id)
+        if not ustorage:
+             return {'success': False, 'msg': u'设备不存在', 'code': 302}
+        try:
+            shelf_obj = shelf_obj.objects.get(uid)
+            shelf_obj.update({"storageid": new_parent_id})
+            shelf_obj.save()
+            log = _insert_log('freeze_shelf', 'update', str(uid), str(new_parent_id))
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'迁移失败,数据库错误', 'code': 301}
+
+def delete_storage():
+    pass
+
 def add_room(name, rank, parent_id):
     new_node = room.objects.create(
         name = name,

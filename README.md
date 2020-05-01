@@ -13,6 +13,27 @@ Param：{
 }
 ```
 
+# 删除:
+###  Url: http://118.24.161.188:8889/delete_unit
+###  请求方式: POST
+```json
+Param：{
+   "uid": "要删除的id",  #有内容的空间不能删除(后端判定),
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+}
+```
+
+# 迁移剪切():
+###  Url: http://118.24.161.188:8889/update_unit
+###  请求方式: POST
+```json
+Param：{
+   "uid": "要删除id",  
+   "new_parent_id": "迁移地儿的id",
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+}
+```
+
 # 添加存储设备:
 ### Url: http://118.24.161.188:8889/add_storage_device
 ### 请求方式: POST

@@ -21,6 +21,27 @@ def check_login(func):
 def index(request):
     return render(request, 'public/index.html')
     
+def delete_unit(request):
+    uid = request.POST.get('uid', '')
+    dtype = request.POST.get('dtype', '')
+    if not uid:
+        return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid不存在'})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    rst = delete_unit(uid, dtype)
+    return JsonResponse(rst)
+
+def update_unit(request):
+    uid = request.POST.get('uid', '')
+    new_parent_id = request.POST.get('new_parent_id', '')
+    dtype = request.POST.get('dtype', '')
+    if not (uid and new_uid):
+        return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    rst = update_unit(uid, new_parent_id , dtype)
+    return JsonResponse(rst)
+
 #@check_login
 def query_all_node(request):
     ''' 获取所有节点 '''
