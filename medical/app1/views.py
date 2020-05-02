@@ -80,23 +80,23 @@ def query_all_node(request):
 
 def query_shelf_by_storage_id(request):
     ''' 获取所有节点 '''
-    storage_id = request.POST['uid']
+    storage_id = request.GET['uid']
     freeze_shelfs = query_freeze_shelf_by_store_id(storage_id)
-    rst = []
+    rst = {"shelf": []}
     for shelf in freeze_shelfs:
         foo = {}
         format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
         foo['shelf'] = format_list
-        for k,v in mongo_to_dict_helper(store).items():
+        for k,v in mongo_to_dict_helper(shelf).items():
             if k not in ('shelftype','detailtype','storageid'):
-                ustore[k] = v
+                foo[k] = v
             elif k == 'shelftype':
-                ustore['utype'] = v
+                foo['utype'] = v
             elif k == 'detailtype':
-                ustore['dtype'] = v
+                foo['dtype'] = v
             elif k == 'storageid ':
-                ustore['parent_id'] = v
-        rst.append(foo)
+                foo['parent_id'] = v
+        rst["shelf"].append(foo)
     return JsonResponse(rst)
 
 @csrf_exempt
@@ -281,9 +281,10 @@ def add_new_freeze_box(request):
     # 获取已经存在的冻存盒数
     boxs = query_boxs_by_shelf_id(shelf_id)
     # TODO根据冻存架type,确定排列位子
-    box_order = query_code_name_by_type(len(boxs), shelf.utype, shelf.shelfline, shelf.shelfcolumn, 'box')
-    box_id = request.POST.get('boxid', 'system_add_id')
-    box_note = request.POST.get('boxnote', 'system_add_note')
+    #box_order = query_code_name_by_type(len(boxs), shelf.utype, shelf.shelfline, shelf.shelfcolumn, 'box')
+    box_order = request.POST['box_order']
+    box_id = request.POST.get('box_id', 'system_add_id')  #自定义id
+    box_note = request.POST.get('box_note', 'system_add_note')  # 冻存盒说明
     flag = add_freeze_box(name,box_id,utype,box_order,rank,shelf_id,box_note,boxline,boxcolumn)
     if flag:
         rst = {

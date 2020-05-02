@@ -96,7 +96,8 @@ Param：{
     "utype": "冻存盒类别(‘1’，’2’，’3’)",
     "boxline": "冻存盒行数(整型)", 
     "boxcolumn": "冻存盒列数(整形)",
-    "boxid": "冻存盒自定义id",
-    "boxnote": "冻存盒描述",
+    "box_order": "冻存盒位子",
+    "box_id": "冻存盒自定义id",
+    "box_note": "冻存盒描述",
 }
 ```

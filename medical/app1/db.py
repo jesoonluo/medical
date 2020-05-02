@@ -225,4 +225,4 @@ def query_item_by_code_by_id(utable, parent_id, code_name):
     if utable == 'storage':
         return freeze_shelf.objects.filter(storageid=parent_id).filter(shelforder=code_name).first()
     elif utable == 'shelf':
-        return freeze_box.objects.filter(shelf_id=parent_id).filter(boxorder=code_name).first()
+        return freeze_box.objects.filter(shelfid=parent_id).filter(boxorder=code_name).first()
