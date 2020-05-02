@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('query_node',views.query_all_node),
+    path('query_all',views.query_all_node_new),
     path('query_shelfs',views.query_shelf_by_storage_id),
     path('add_room',views.add_new_room),
     path('delete_unit',views.delete_unit),

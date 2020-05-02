@@ -75,14 +75,54 @@ def query_all_node(request):
                     elif k == 'room_id':
                         ustore['parent_id'] = v
                 rst['store'].append(ustore)
+    return JsonResponse(rst)
+
+def query_all_node_new(request):
+    ''' 获取所有节点 '''
+    all_room = query_all_room()
+    rst = {'store':[]}
+    if not all_room:
+        first_node = init_node_room()
+        rst['store'].append({k:v for k,v in mongo_to_dict_helper(first_node).items()})
+    else:
+        for room in all_room:
+            uroom = {'dtype': '0'}
+            for k,v in mongo_to_dict_helper(room).items():
+                if k != 'roomtype':
+                    uroom[k] = v
+                else:
+                    uroom['utype'] = v
+            rst['store'].append(uroom)
+            # 查询room下的设备列表
+            all_store = query_storage_device_by_room_id(str(room.id))
+            for store in all_store:
+                ustore = {}
+                format_list = format_storage_list(store.storagetype , store.storageline, store.storagecolumn, store.detailtype, store.id, 'storage')
+                ustore['fridge'] = format_list
+                for k,v in mongo_to_dict_helper(store).items():
+                    if k not in ('storagetype','detailtype','room_id'):
+                        ustore[k] = v
+                    elif k == 'storagetype':
+                        ustore['utype'] = v
+                    elif k == 'detailtype':
+                        ustore['dtype'] = v
+                    elif k == 'room_id':
+                        ustore['parent_id'] = v
+                rst['store'].append(ustore)
+                shelfs = query_shelf_by_storage_id_own(str(store.id))
+                for shelf in shelfs:
+                    rst['store'].append(shelf)
                 #查询存储设备里的冻存架
+                    boxs = query_box_by_shelf_id(str(shelf['id']))
+                    for box in boxs:
+                        rst['store'].append(box)
     return JsonResponse(rst)
 
 def query_shelf_by_storage_id(request):
     ''' 获取所有节点 '''
     storage_id = request.GET['uid']
     freeze_shelfs = query_freeze_shelf_by_store_id(storage_id)
-    rst = {"shelf": []}
+    rst = {"shelf": [], 'box_list': []}
     for shelf in freeze_shelfs:
         foo = {}
         format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
@@ -94,10 +134,52 @@ def query_shelf_by_storage_id(request):
                 foo['utype'] = v
             elif k == 'detailtype':
                 foo['dtype'] = v
-            elif k == 'storageid ':
+            elif k == 'storageid':
                 foo['parent_id'] = v
         rst["shelf"].append(foo)
+        #查询存储设备里的冻存架
+        boxs = query_box_by_shelf_id(str(shelf.id))
+        for box in boxs:
+            rst['box_list'].append(box)
     return JsonResponse(rst)
+
+def query_shelf_by_storage_id_own(storage_id):
+    #通过设备id获取冻存架
+    rst = []
+    freeze_shelfs = query_freeze_shelf_by_store_id(storage_id)
+    for shelf in freeze_shelfs:
+        foo = {}
+        format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
+        foo['shelf'] = format_list
+        for k,v in mongo_to_dict_helper(shelf).items():
+            if k not in ('shelftype','detailtype','storageid'):
+                foo[k] = v
+            elif k == 'shelftype':
+                foo['utype'] = v
+            elif k == 'detailtype':
+                foo['dtype'] = v
+            elif k == 'storageid':
+                foo['parent_id'] = v
+        rst.append(foo)
+    return rst
+
+def query_box_by_shelf_id(shelf_id):
+    #通过冻存架id获取冻存盒
+    rst = []
+    freeze_boxs = query_boxs_by_shelf_id(shelf_id)
+    for box in freeze_boxs:
+        foo = {}
+        format_list = format_box_list(box.boxtype, box.boxline, box.boxcolumn, box.id)
+        foo['box'] = format_list
+        for k,v in mongo_to_dict_helper(box).items():
+            if k not in ('boxtype','shelfid'):
+                foo[k] = v
+            elif k == 'boxtype':
+                foo['utype'] = v
+            elif k == 'shelfid':
+                foo['parent_id'] = v
+        rst.append(foo)
+    return rst
 
 @csrf_exempt
 def add_new_room(request):

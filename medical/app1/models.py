@@ -44,7 +44,7 @@ class freeze_box(mongoengine.Document):
     # 冻存盒(放在冻存架上)
     shelfid = mongoengine.StringField(max_length=64)       #冻存架id
     boxorder = mongoengine.StringField(max_length=16)                      #顺序号(用于存储冻存架的顺序)
-    boxfname = mongoengine.StringField(max_length=32)
+    boxname = mongoengine.StringField(max_length=32)
     boxid = mongoengine.StringField(max_length=32)         #冻存盒自定义id
     boxtype = mongoengine.StringField(max_length=32)       
     boxline = mongoengine.IntField()

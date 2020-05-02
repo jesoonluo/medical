@@ -23,7 +23,7 @@ def query_shelf_by_id(shelf_id):
     return freeze_shelf.objects.filter(id=shelf_id).first()
 
 def query_boxs_by_shelf_id(shelf_id):
-    return freeze_box.objects.filter(shelf_id=shelf_id).all()
+    return freeze_box.objects.filter(shelfid=shelf_id).all()
 
 def _insert_log(table, op_type, op_id, desc_id='', desc_text=''):
     log = log_info.objects.create(
@@ -207,8 +207,8 @@ def add_freeze_box(boxname,boxid,utype,boxorder,rank,shelf_id,box_note,boxline=1
         boxline = boxline,
         boxcolumn = boxcolumn,
         rank = int(rank),
-        shelf_id = shelf_id, 
-        box_note=box_note,     # 冻存盒描述
+        shelfid = shelf_id, 
+        boxnote=box_note,     # 冻存盒描述
     )
     try:
         new_box.save()

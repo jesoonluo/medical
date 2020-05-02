@@ -67,6 +67,21 @@ def format_shelf_list(code_method, line, column, shelf_id):
         exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(code_name))
         if exist_child:
             foo['id'] = str(exist_child['id'])
+            foo['percent'] = 1
+        rst.append(foo)
+    return rst
+
+def format_box_list(code_method, line, column, box_id):
+    code_list = [i for i in range(int(line)*int(column))]
+    rst = []
+    for i in range(int(line)*int(column)):
+        foo = {}
+        foo['percent'] = 0
+        code_name = str(i)
+        foo['name'] = code_name
+        #exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(code_name))
+        #if exist_child:
+        #    foo['id'] = str(exist_child['id'])
         rst.append(foo)
     return rst
 
