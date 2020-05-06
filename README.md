@@ -25,13 +25,24 @@ Param：{
 }
 ```
 
-# 迁移剪切():
+# 迁移剪切:
 ###  Url: http://118.24.161.188:8889/update_unit
 ###  请求方式: POST
 ```json
 Param：{
-   "uid": "要删除id",  
+   "uid": "要迁移id",  
    "new_parent_id": "迁移地儿的id",
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+}
+```
+
+# 迁移复制:
+###  Url: http://118.24.161.188:8889/copy_unit
+###  请求方式: POST
+```json
+Param：{
+   "uid": "要复制id",  
+   "new_parent_id": "复制地儿的id",
    "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
 }
 ```

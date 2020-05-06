@@ -46,6 +46,18 @@ def update_unit(request):
     rst = update_unit_db(uid, new_parent_id , dtype)
     return JsonResponse(rst)
 
+@csrf_exempt
+def copy_unit(request):
+    uid = request.POST.get('uid', '')
+    new_parent_id = request.POST.get('new_parent_id', '')
+    dtype = request.POST.get('dtype', '')
+    if not (uid and new_parent_id):
+        return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    rst = copy_unit_view(uid, new_parent_id , dtype)
+    return JsonResponse(rst)
+
 #@check_login
 def query_all_node(request):
     ''' 获取所有节点 '''
@@ -70,10 +82,12 @@ def query_all_node(request):
                 format_list = format_storage_list(store.storagetype , store.storageline, store.storagecolumn, store.detailtype, store.id, 'storage')
                 ustore['fridge'] = format_list
                 for k,v in mongo_to_dict_helper(store).items():
-                    if k not in ('storagetype','detailtype','room_id'):
+                    if k not in ('storagetype','detailtype','room_id', 'storagename'):
                         ustore[k] = v
                     elif k == 'storagetype':
                         ustore['utype'] = v
+                    elif k == 'storagename':
+                        ustore['name'] = v
                     elif k == 'detailtype':
                         ustore['dtype'] = v
                     elif k == 'room_id':
@@ -104,10 +118,12 @@ def query_all_node_new(request):
                 format_list = format_storage_list(store.storagetype , store.storageline, store.storagecolumn, store.detailtype, store.id, 'storage')
                 ustore['fridge'] = format_list
                 for k,v in mongo_to_dict_helper(store).items():
-                    if k not in ('storagetype','detailtype','room_id'):
+                    if k not in ('storagetype','detailtype','room_id', 'storagename'):
                         ustore[k] = v
                     elif k == 'storagetype':
                         ustore['utype'] = v
+                    elif k == 'storagename':
+                        ustore['name'] = v
                     elif k == 'detailtype':
                         ustore['dtype'] = v
                     elif k == 'room_id':
@@ -116,7 +132,7 @@ def query_all_node_new(request):
                 shelfs = query_shelf_by_storage_id_own(str(store.id))
                 for shelf in shelfs:
                     rst['store'].append(shelf)
-                #查询存储设备里的冻存架
+                    #查询存储设备里的冻存s
                     boxs = query_box_by_shelf_id(str(shelf['id']))
                     for box in boxs:
                         rst['store'].append(box)
@@ -132,10 +148,12 @@ def query_shelf_by_storage_id(request):
         format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
         foo['shelf'] = format_list
         for k,v in mongo_to_dict_helper(shelf).items():
-            if k not in ('shelftype','detailtype','storageid'):
+            if k not in ('shelftype','detailtype','storageid','shelfname'):
                 foo[k] = v
             elif k == 'shelftype':
                 foo['utype'] = v
+            elif k == 'shelfname':
+                foo['name'] = v
             elif k == 'detailtype':
                 foo['dtype'] = v
             elif k == 'storageid':
@@ -156,10 +174,12 @@ def query_shelf_by_storage_id_own(storage_id):
         format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
         foo['shelf'] = format_list
         for k,v in mongo_to_dict_helper(shelf).items():
-            if k not in ('shelftype','detailtype','storageid'):
+            if k not in ('shelftype','detailtype','storageid', 'shelfname'):
                 foo[k] = v
             elif k == 'shelftype':
                 foo['utype'] = v
+            elif k == 'shelfname':
+                foo['name'] = v
             elif k == 'detailtype':
                 foo['dtype'] = v
             elif k == 'storageid':
@@ -176,10 +196,12 @@ def query_box_by_shelf_id(shelf_id):
         format_list = format_box_list(box.boxtype, box.boxline, box.boxcolumn, box.id)
         foo['box'] = format_list
         for k,v in mongo_to_dict_helper(box).items():
-            if k not in ('boxtype','shelfid'):
+            if k not in ('boxtype','shelfid','boxname'):
                 foo[k] = v
             elif k == 'boxtype':
                 foo['utype'] = v
+            elif k == 'boxname':
+                foo['name'] = v
             elif k == 'shelfid':
                 foo['parent_id'] = v
         rst.append(foo)

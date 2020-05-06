@@ -124,8 +124,106 @@ def update_unit_db(uid, new_parent_id, dtype):
         except:
             return {'success': False, 'msg': u'迁移失败,数据库错误', 'code': 301}
 
-def delete_storage():
-    pass
+def _copy_name(old_name):
+    new_name = old_name
+    if old_name.endswith(')'):
+        try:
+            order = int(old_name[-2])
+            new_order = order + 1
+            new_name = order.split('(')[0] + str(new_order) + ')'
+        except:
+            new_name = old_name + '(1)'
+    else:
+        new_name = old_name + '(1)'
+    return 
+        
+def _copy_unit(obj, table, parent_id):
+    new_id = None
+    if table == 'room':
+        new_id = add_room(_copy_name(obj.name), obj.rank, parent_id)
+    elif table == 'storage':
+        new_id = add_new_storage(
+            _copy_name(obj.storagename),
+            obj.terminalname,
+            obj.storageid,
+            obj.storagetype,
+            obj.detailtype,
+            obj.rank,
+            parent_id, 
+            obj.storageline, 
+            obj.storagecolumn
+        )
+    elif table == 'shelf':
+        new_id = add_freeze_shelf(
+            _copy_name(obj.shelfname),
+            obj.shelftype,
+            obj.detailtype,
+            obj.shelforder,
+            obj.rank,
+            parent_id,
+            obj.hands_direction,
+            obj.shelfline,
+            obj.shelfcolumn
+        )
+    elif table == 'box':
+        new_id = add_freeze_box(
+            _copy_name(obj.boxname),
+            obj.boxid,
+            obj.boxtype,
+            obj.boxorder,
+            obj.rank,
+            parent_id,
+            obj.box_note,
+            obj.boxline,
+            obj.boxcolumn
+        )
+    return new_id
+
+def copy_unit_view(uid, new_parent_id, dtype):
+    #try:
+    if dtype == 'folder':
+        uparent = room.objects.filter(id=new_parent_id).first()
+        if not uparent:
+             return {'success': False, 'msg': u'新父节点不存在', 'code': 302}
+        room = room.objects.filter(id=uid).first()
+        new_room_id = _copy_unit(room,'room', str(room.parent_id))
+        # 复制room下冰箱
+        stores = query_storage_device_by_room_id(room.id)
+        for store in stores:
+            new_store_id = _copy_unit(store,'storage', new_room_id)
+            # 复制设备下冻存架
+            shelfs = query_freeze_shelf_by_store_id(store.id)
+            for shelf in shelfs:
+                new_shelf_id = _copy_unit(shelf,'shelf', new_store_id)
+                # 复制冻存架下面冻存盒
+                boxs = query_boxs_by_shelf_id(shelf.id)
+                for box in boxs:
+                    new_box_id = _copy_unit(box,'box', new_shelf_id)
+    elif dtype == 'storage':
+        uroom = room.objects.filter(id=new_parent_id).first()
+        if not uroom:
+             return {'success': False, 'msg': u'空间不存在', 'code': 302}
+        store = storage_device.objects.filter(id=uid).first()
+        new_store_id = _copy_unit(store,'storage', new_parent_id)
+        # 复制设备下冻存架
+        shelfs = query_freeze_shelf_by_store_id(store.id)
+        for shelf in shelfs:
+            new_shelf_id = _copy_unit(shelf,'shelf', new_store_id)
+            # 复制冻存架下面冻存盒
+            boxs = query_boxs_by_shelf_id(shelf.id)
+            for box in boxs:
+                new_box_id = _copy_unit(box,'box', new_shelf_id)
+    elif dtype == 'freeze_shelf':
+        ustorage = storage_device.objects.filter(id=new_parent_id).first()
+        if not ustorage:
+             return {'success': False, 'msg': u'设备不存在', 'code': 302}
+        new_shelf_id = _copy_unit(shelf,'shelf', new_parent_id)
+        boxs = query_boxs_by_shelf_id(new_shelf_id)
+        for box in boxs:
+            new_box_id = _copy_unit(box,'box', new_shelf_id)
+    return {'success': True, 'msg': u'', 'code':200}
+    #except:
+    #   return {'success': False, 'msg': u'复制失败,数据库错误', 'code': 301}
 
 def add_room(name, rank, parent_id):
     new_node = room.objects.create(
