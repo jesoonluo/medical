@@ -59,7 +59,7 @@ def init_node_room():
         return None
     return new_first_node
 
-def delete_unit(uid, dtype):
+def delete_unit_db(uid, dtype):
     #判断该room下是否存在别的空间或是存储设备
     if dtype == 'folder':
         child_room = room.objects.filter(parent_id=uid).all()
@@ -93,16 +93,14 @@ def delete_unit(uid, dtype):
         except:
             return {'success': False, 'msg': u'删除失败,数据库错误', 'code': 301}
 
-def update_unit(uid, new_parent_id, dtype):
+def update_unit_db(uid, new_parent_id, dtype):
     #判断该room下是否存在别的空间或是存储设备
     if dtype == 'folder':
         uparent = room.objects.filter(id=new_parent_id).first()
         if not uparent:
              return {'success': False, 'msg': u'新父节点不存在', 'code': 302}
         try:
-            room_obj = room.objects.filter(id=uid).first()
-            room_obj.update({"parent_id": new_parent_id})
-            room_obj.save()
+            room.objects(id=uid).update(parent_id=new_parent_id)
             log = _insert_log('room', 'update', str(uid), str(new_parent_id))
             return {'success': True, 'msg': u'', 'code':200}
         except:
@@ -111,22 +109,16 @@ def update_unit(uid, new_parent_id, dtype):
         uroom = room.objects.filter(id=new_parent_id).first()
         if not uroom:
              return {'success': False, 'msg': u'空间不存在', 'code': 302}
-        try:
-            storage_obj = storage_device.objects.filter(id=uid).first()
-            storage_obj.update({"room_id": new_parent_id})
-            storage_obj.save()
-            log = _insert_log('storage_device', 'update', str(uid), str(new_parent_id))
-            return {'success': True, 'msg': u'', 'code':200}
-        except:
-            return {'success': False, 'msg': u'迁移失败,数据库错误', 'code': 301}
+        storage_device.objects(id=uid).update(room_id=new_parent_id)
+        log = _insert_log('storage_device', 'update', str(uid), str(new_parent_id))
+        return {'success': True, 'msg': u'', 'code':200}
+        #return {'success': False, 'msg': u'迁移失败,数据库错误', 'code': 301}
     elif dtype == 'freeze_shelf':
         ustorage = storage_device.objects.filter(id=new_parent_id).first()
         if not ustorage:
              return {'success': False, 'msg': u'设备不存在', 'code': 302}
         try:
-            shelf_obj = shelf_obj.objects.filter(id=uid).first()
-            shelf_obj.update({"storageid": new_parent_id})
-            shelf_obj.save()
+            shelf_obj.objects(id=uid).update({"storageid": new_parent_id})
             log = _insert_log('freeze_shelf', 'update', str(uid), str(new_parent_id))
             return {'success': True, 'msg': u'', 'code':200}
         except:

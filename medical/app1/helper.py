@@ -64,10 +64,12 @@ def format_shelf_list(code_method, line, column, shelf_id):
         elif code_method == '2':
             code_name = str(reverse_list(i))
         foo['name'] = code_name
+        foo['dname'] = ''
         exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(code_name))
         if exist_child:
             foo['id'] = str(exist_child['id'])
             foo['percent'] = 1
+            foo['dname'] = exist_child['boxname']
         rst.append(foo)
     return rst
 
@@ -79,6 +81,7 @@ def format_box_list(code_method, line, column, box_id):
         foo['percent'] = 0
         code_name = str(i)
         foo['name'] = code_name
+        foo['dname'] = ''
         #exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(code_name))
         #if exist_child:
         #    foo['id'] = str(exist_child['id'])
@@ -95,11 +98,16 @@ def format_storage_list(code_method, line, column, storage, parent_id, utable):
             foo['name'] = code_name
             exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name))
             foo['percent'] = 0
+            foo['dname'] = ''
             if exist_child:
                 exist_item += 1
                 foo['id'] = str(exist_child['id'])
                 #foo['percent'] = _get_percent(exist_child, utable)
                 foo['percent'] = 1
+                if utable == 'storage':
+                    foo['dname'] = exist_child['shelfname']
+                elif utable == 'shelf':
+                    foo['dname'] = exist_child['boxname']
             rst.append(foo)
         return rst
     for i in range(int(line)):
@@ -111,10 +119,15 @@ def format_storage_list(code_method, line, column, storage, parent_id, utable):
             #添加具体信息
             exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name))
             foo['percent'] = 0
+            foo['dname'] = ''
             if exist_child:
                 exist_item += 1
                 foo['id'] = str(exist_child['id'])
                 foo['percent'] = 1
+                if utable == 'storage':
+                    foo['dname'] = exist_child['shelfname']
+                elif utable == 'shelf':
+                    foo['dname'] = exist_child['boxname']
             foo_list.append(foo)
         rst.append(foo_list)
     return rst

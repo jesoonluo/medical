@@ -21,25 +21,29 @@ def check_login(func):
 def index(request):
     return render(request, 'public/index.html')
     
+@csrf_exempt
 def delete_unit(request):
+    print('*'*10, dict(request.POST))
     uid = request.POST.get('uid', '')
     dtype = request.POST.get('dtype', '')
     if not uid:
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid不存在'})
     if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
         return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
-    rst = delete_unit(uid, dtype)
+    rst = delete_unit_db(uid, dtype)
     return JsonResponse(rst)
 
+@csrf_exempt
 def update_unit(request):
+    print('*'*10, dict(request.POST))
     uid = request.POST.get('uid', '')
     new_parent_id = request.POST.get('new_parent_id', '')
     dtype = request.POST.get('dtype', '')
-    if not (uid and new_uid):
+    if not (uid and new_parent_id):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
     if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
         return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
-    rst = update_unit(uid, new_parent_id , dtype)
+    rst = update_unit_db(uid, new_parent_id , dtype)
     return JsonResponse(rst)
 
 #@check_login
