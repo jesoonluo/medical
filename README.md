@@ -32,7 +32,8 @@ Param：{
 Param：{
    "uid": "要迁移id",  
    "new_parent_id": "迁移地儿的id",
-   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架",
+   "new_postion": "新冻存架的位子(在dtype为freeze_shelf时指定)"
 }
 ```
 

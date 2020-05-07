@@ -128,7 +128,7 @@ def delete_unit_db(uid, dtype):
         except:
             return {'success': False, 'msg': u'删除失败,数据库错误', 'code': 301}
 
-def update_unit_db(uid, new_parent_id, dtype):
+def update_unit_db(uid, new_parent_id, dtype, new_position=None):
     #判断该room下是否存在别的空间或是存储设备
     if dtype == 'folder':
         uparent = room.objects.filter(id=new_parent_id).first()
@@ -150,10 +150,10 @@ def update_unit_db(uid, new_parent_id, dtype):
         #return {'success': False, 'msg': u'迁移失败,数据库错误', 'code': 301}
     elif dtype == 'freeze_shelf':
         ustorage = storage_device.objects.filter(id=new_parent_id).first()
-        if not ustorage:
-             return {'success': False, 'msg': u'设备不存在', 'code': 302}
+        if not ustorage or not new_position:
+             return {'success': False, 'msg': u'设备不存在或是未指定位子', 'code': 302}
         try:
-            shelf_obj.objects(id=uid).update({"storageid": new_parent_id})
+            shelf_obj.objects(id=uid).update({"storageid": new_parent_id, "shelforder": new_postion})
             log = _insert_log('freeze_shelf', 'update', str(uid), str(new_parent_id))
             return {'success': True, 'msg': u'', 'code':200}
         except:

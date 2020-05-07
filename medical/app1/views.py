@@ -39,6 +39,9 @@ def update_unit(request):
     uid = request.POST.get('uid', '')
     new_parent_id = request.POST.get('new_parent_id', '')
     dtype = request.POST.get('dtype', '')
+    new_postion = request.POST.get('new_postion', None)
+    if dtype == 'freeze_shelf' and (not new_postion):
+        return JsonResponse({'success': False, 'code': 201, 'msg': '请指定冻存架位子'})
     if not (uid and new_parent_id):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
     if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
