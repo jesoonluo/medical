@@ -353,7 +353,7 @@ def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
     print('*'*10, dict(request.POST))
     shelfname = request.POST['name']
-    if check_name(name, 'freeze_shelf'):
+    if check_name(shelfname, 'freeze_shelf'):
         return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     rank = request.POST['rank']
     shelfline = request.POST['shelfline']     # 行数

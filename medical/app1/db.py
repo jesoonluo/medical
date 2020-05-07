@@ -39,7 +39,7 @@ def _insert_log(table, op_type, op_id, desc_id='', desc_text=''):
         return False
     return True
 
-def check_name(new_name, table):
+def check_name(new_name, dtype):
     obj = None
     if dtype == 'room':
         obj = room.objects.filter(name=new_name).first()
