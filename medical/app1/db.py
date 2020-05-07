@@ -39,6 +39,20 @@ def _insert_log(table, op_type, op_id, desc_id='', desc_text=''):
         return False
     return True
 
+def check_name(new_name, table):
+    obj = None
+    if dtype == 'room':
+        obj = room.objects.filter(name=new_name).first()
+    elif dtype == 'storage':
+        obj = storage_device.objects.filter(storagename=new_name).first()
+    elif dtype == 'freeze_shelf':
+        obj = freeze_shelf.objects.filter(shelfname=new_name).first()
+    elif dtype == 'freeze_box':
+        obj = freeze_box.objects.filter(boxname=new_name).first()
+    if obj:
+        return True
+    return False
+
 def init_node_room():
     exist = room.objects.filter(parent_id='0').first()
     if exist:
@@ -235,7 +249,7 @@ def _copy_unit(obj, table, parent_id, new_position):
             new_position,
             obj.rank,
             parent_id,
-            obj.box_note,
+            obj.boxnote,
             obj.boxline,
             obj.boxcolumn
         )
@@ -334,7 +348,7 @@ def add_new_storage(storagename,terminalname,storageid,utype,dtype,rank,room_id,
         return None
     return str(new_store.id)
 
-def add_freeze_shelf(shelfname,utype,dtype,shelforder,rank,storage_id,hands_direction,shelfline=10,shelfcolumn=10):
+def add_freeze_shelf(shelfname,utype,dtype,shelforder,rank,storage_id,hands_direction,shelfline=10,shelfcolumn=10,shelf_style='AAA'):
     new_shelf = freeze_shelf(
         shelfname = shelfname,
         shelftype = utype,
@@ -344,7 +358,8 @@ def add_freeze_shelf(shelfname,utype,dtype,shelforder,rank,storage_id,hands_dire
         shelfcolumn = shelfcolumn,
         rank = int(rank),
         storageid = storage_id,
-        hands_direction=hands_direction
+        hands_direction=hands_direction,
+        shelfstyle=shelf_style
     )
     try:
         new_shelf.save()

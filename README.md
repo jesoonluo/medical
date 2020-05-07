@@ -104,7 +104,8 @@ Param：{
 "shelfline": "冻存架行数(整型)", 
 "shelfcolumn": "冻存架列数(整型)",
 "shelf_order": "设备位子,A1",
-"hands_direction": "拉手方向"
+"hands_direction": "拉手方向",
+"shelf_style": "冻存架编码风格(AAA-默认,BBB.., 只有utype为1时即纯数字有效,2,3时此风格无效)"
 }
 ```
 

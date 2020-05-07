@@ -28,8 +28,8 @@ def delete_unit(request):
     dtype = request.POST.get('dtype', '')
     if not uid:
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid不存在'})
-    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
-        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf', 'freeze_box'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf', 'freeze_box')"})
     rst = delete_unit_db(uid, dtype)
     return JsonResponse(rst)
 
@@ -44,8 +44,8 @@ def update_unit(request):
         return JsonResponse({'success': False, 'code': 201, 'msg': '请指定冻存架位子'})
     if not (uid and new_parent_id):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
-    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
-        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf', 'freeze_box'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf', 'freeze_box')"})
     rst = update_unit_db(uid, new_parent_id , dtype, new_postion)
     return JsonResponse(rst)
 
@@ -60,8 +60,8 @@ def copy_unit(request):
         return JsonResponse({'success': False, 'code': 201, 'msg': '请指定新冻存架位子'})
     if not (uid and new_parent_id):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
-    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
-        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf', 'freeze_box'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf', 'freeze_box')"})
     rst = copy_unit_view(uid, new_parent_id , dtype, new_postion)
     return JsonResponse(rst)
 
@@ -72,8 +72,8 @@ def rename_unit(request):
     dtype = request.POST.get('dtype', '')
     if not (uid and new_name):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_name不存在'})
-    if not dtype or (dtype not in ('folder', 'storage', 'freeze_shelf')):
-        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf', 'freeze_box'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf', 'freeze_box')"})
     rst = rename_unit_db(uid, new_name , dtype)
     return JsonResponse(rst)
 
@@ -164,7 +164,7 @@ def query_shelf_by_storage_id(request):
     rst = {"shelf": [], 'box_list': []}
     for shelf in freeze_shelfs:
         foo = {}
-        format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
+        format_list = format_shelf_list(shelf.shelfstyle, shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
         foo['shelf'] = format_list
         for k,v in mongo_to_dict_helper(shelf).items():
             if k not in ('shelftype','detailtype','storageid','shelfname'):
@@ -190,7 +190,7 @@ def query_shelf_by_storage_id_own(storage_id):
     freeze_shelfs = query_freeze_shelf_by_store_id(storage_id)
     for shelf in freeze_shelfs:
         foo = {}
-        format_list = format_shelf_list(shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
+        format_list = format_shelf_list(shelf.shelfstyle, shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id)
         foo['shelf'] = format_list
         for k,v in mongo_to_dict_helper(shelf).items():
             if k not in ('shelftype','detailtype','storageid', 'shelfname'):
@@ -231,6 +231,8 @@ def query_box_by_shelf_id(shelf_id):
 @csrf_exempt
 def add_new_room(request):
     name = request.POST['name']
+    if check_name(name, 'room'):
+        return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     rank = request.POST['rank']
     parent_id = request.POST['parent_id']
     all_room_ids = query_all_room_ids()
@@ -266,6 +268,8 @@ def add_storage_N2(request):
     ''' 添加液氮罐 '''
     print('*'*10, dict(request.POST))
     name = request.POST['name']
+    if check_name(name, 'storage'):
+        return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     terminalname = ''
     storageid = request.POST['storage_id']
     rank = request.POST['rank']
@@ -306,6 +310,8 @@ def add_new_storage_device(request):
     ''' 添加新的设备 '''
     print('*'*10, dict(request.POST))
     name = request.POST['name']
+    if check_name(name, 'storage'):
+        return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     terminalname = request.POST['terminal_name']
     storageid = request.POST['storage_id']
     rank = request.POST['rank']
@@ -347,6 +353,8 @@ def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
     print('*'*10, dict(request.POST))
     shelfname = request.POST['name']
+    if check_name(name, 'freeze_shelf'):
+        return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     rank = request.POST['rank']
     shelfline = request.POST['shelfline']     # 行数
     shelfcolumn = request.POST['shelfcolumn'] # 列数
@@ -355,6 +363,7 @@ def add_new_freeze_shelf(request):
     utype = request.POST['utype']             # 冻存架排列方式(1->正序,2->逆序)
     dtype = request.POST['dtype']             # 冻存架类别
     shelf_order = request.POST['shelf_order'] # 编号,设备上的编号
+    shelf_style = request.POST.get('shelf_style','AAA') #冻存架编码方式
     #TODO 验证编号和设备的编码方式是否一致
     msg = ''
     storage = query_storage_by_id(store_id)
@@ -370,7 +379,7 @@ def add_new_freeze_shelf(request):
     #shelfs = query_freeze_shelf_by_store_id(store_id)
     # TODO根据冻存架type,确定排列位子
     # shelf_order = query_code_name_by_type(len(shelfs), storage.utype, storage.storageline, storage.storagecolumn, storage.detailtype )
-    flag = add_freeze_shelf(shelfname,utype,dtype,shelf_order,rank,store_id,hands_direction,shelfline,shelfcolumn)
+    flag = add_freeze_shelf(shelfname,utype,dtype,shelf_order,rank,store_id,hands_direction,shelfline,shelfcolumn,shelf_style)
     if flag:
         rst = {
              'success': flag,
@@ -392,6 +401,8 @@ def add_new_freeze_shelf(request):
 def add_new_freeze_box(request):
     ''' 添加新的冻存盒 '''
     name = request.POST['name']
+    if check_name(name, 'freeze_box'):
+        return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     rank = request.POST['rank']
     boxline = request.POST['boxline']         # 行数
     boxcolumn = request.POST['boxcolumn']     # 列数

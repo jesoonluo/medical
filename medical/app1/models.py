@@ -35,6 +35,7 @@ class freeze_shelf(mongoengine.Document):
     shelfname = mongoengine.StringField(max_length=32)
     hands_direction = mongoengine.StringField(max_length=16) # 拉手方向
     shelftype = mongoengine.StringField(max_length=32)       # 冻存架排列方式两种(正序,逆序)
+    shelfstyle = mongoengine.StringField(max_length=16)      # 冻存架的编码风格(顺序，水平，垂直AAA,BBB)
     detailtype = mongoengine.StringField(max_length=16, default='0')    #冻存架类别(立式)
     shelfline = mongoengine.IntField()
     shelfcolumn = mongoengine.IntField()
