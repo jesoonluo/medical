@@ -46,19 +46,23 @@ def update_unit(request):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
     if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
         return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
-    rst = update_unit_db(uid, new_parent_id , dtype)
+    rst = update_unit_db(uid, new_parent_id , dtype, new_postion)
     return JsonResponse(rst)
 
 @csrf_exempt
 def copy_unit(request):
+    print('*'*10, dict(request.POST))
     uid = request.POST.get('uid', '')
     new_parent_id = request.POST.get('new_parent_id', '')
     dtype = request.POST.get('dtype', '')
+    new_postion = request.POST.get('new_postion', None)
+    if dtype == 'freeze_shelf' and (not new_postion):
+        return JsonResponse({'success': False, 'code': 201, 'msg': '请指定新冻存架位子'})
     if not (uid and new_parent_id):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_parent_id不存在'})
     if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
         return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
-    rst = copy_unit_view(uid, new_parent_id , dtype)
+    rst = copy_unit_view(uid, new_parent_id , dtype, new_postion)
     return JsonResponse(rst)
 
 @csrf_exempt
@@ -68,7 +72,7 @@ def rename_unit(request):
     dtype = request.POST.get('dtype', '')
     if not (uid and new_name):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_name不存在'})
-    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
+    if not dtype or (dtype not in ('folder', 'storage', 'freeze_shelf')):
         return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
     rst = rename_unit_db(uid, new_name , dtype)
     return JsonResponse(rst)

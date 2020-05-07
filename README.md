@@ -21,7 +21,7 @@ Param：{
 ```json
 Param：{
    "uid": "要删除的id,有内容的空间不能删除(后端判定)",
-   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架, freeze_box->冻存盒",
 }
 ```
 
@@ -32,7 +32,7 @@ Param：{
 Param：{
    "uid": "要迁移id",  
    "new_parent_id": "迁移地儿的id",
-   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架",
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架, freeze_box->冻存盒",
    "new_postion": "新冻存架的位子(在dtype为freeze_shelf时指定)"
 }
 ```
@@ -44,7 +44,7 @@ Param：{
 Param：{
    "uid": "要复制id",  
    "new_parent_id": "复制地儿的id",
-   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架, freeze_box->冻存盒",
 }
 ```
 
@@ -55,7 +55,7 @@ Param：{
 Param：{
    "uid": "要重命名id",  
    "new_name": "新名字",
-   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架, freeze_box->冻存盒",
 }
 ```
 
