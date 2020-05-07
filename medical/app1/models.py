@@ -47,6 +47,7 @@ class freeze_box(mongoengine.Document):
     boxname = mongoengine.StringField(max_length=32)
     boxid = mongoengine.StringField(max_length=32)         #冻存盒自定义id
     boxtype = mongoengine.StringField(max_length=32)       
+    detailtype = mongoengine.StringField(max_length=16, default='0')    #冻存盒类别
     boxline = mongoengine.IntField()
     boxcolumn = mongoengine.IntField()
     boxnote = mongoengine.StringField(max_length=256, default="")

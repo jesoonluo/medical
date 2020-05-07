@@ -170,6 +170,7 @@ def _copy_unit(obj, table, parent_id):
             _copy_name(obj.boxname),
             obj.boxid,
             obj.boxtype,
+            obj.detailtype,
             obj.boxorder,
             obj.rank,
             parent_id,
@@ -288,12 +289,13 @@ def add_freeze_shelf(shelfname,utype,dtype,shelforder,rank,storage_id,hands_dire
         return None
     return str(new_shelf.id)
 
-def add_freeze_box(boxname,boxid,utype,boxorder,rank,shelf_id,box_note,boxline=10,boxcolumn=10):
+def add_freeze_box(boxname,boxid,utype,dtype,boxorder,rank,shelf_id,box_note,boxline=10,boxcolumn=10):
     new_box = freeze_box(
         boxname = boxname,
         boxid = boxid,         # 冻存盒自定义id
         boxorder = boxorder,   # 根据冻存架的类别确定1,11,A1
         boxtype = utype,
+        detailtype = dtype,
         boxline = boxline,
         boxcolumn = boxcolumn,
         rank = int(rank),

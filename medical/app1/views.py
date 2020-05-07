@@ -196,12 +196,14 @@ def query_box_by_shelf_id(shelf_id):
         format_list = format_box_list(box.boxtype, box.boxline, box.boxcolumn, box.id)
         foo['box'] = format_list
         for k,v in mongo_to_dict_helper(box).items():
-            if k not in ('boxtype','shelfid','boxname'):
+            if k not in ('boxtype','shelfid','boxname','detailtype'):
                 foo[k] = v
             elif k == 'boxtype':
                 foo['utype'] = v
             elif k == 'boxname':
                 foo['name'] = v
+            elif k == 'detailtype':
+                foo['dtype'] = v
             elif k == 'shelfid':
                 foo['parent_id'] = v
         rst.append(foo)
@@ -376,6 +378,7 @@ def add_new_freeze_box(request):
     boxcolumn = request.POST['boxcolumn']     # 列数
     shelf_id = request.POST['parent_id']       # 冻存架id
     utype = request.POST['utype']             # 冻存盒排列方式(1,2,3)
+    dtype = request.POST['dtype']             # 冻存架类别
     msg = ''
     shelf = query_shelf_by_id(shelf_id)
     if not shelf:
@@ -393,7 +396,7 @@ def add_new_freeze_box(request):
     box_order = request.POST['box_order']
     box_id = request.POST.get('box_id', 'system_add_id')  #自定义id
     box_note = request.POST.get('box_note', 'system_add_note')  # 冻存盒说明
-    flag = add_freeze_box(name,box_id,utype,box_order,rank,shelf_id,box_note,boxline,boxcolumn)
+    flag = add_freeze_box(name,box_id,utype,dtype,box_order,rank,shelf_id,box_note,boxline,boxcolumn)
     if flag:
         rst = {
              'success': flag,
