@@ -47,6 +47,17 @@ Param：{
 }
 ```
 
+# 迁移剪切:
+###  Url: http://118.24.161.188:8889/rename_unit
+###  请求方式: POST
+```json
+Param：{
+   "uid": "要重命名id",  
+   "new_name": "新名字",
+   "dtype": "folder->文件夹, storage->设备, freeze_shelf->冻存架"
+}
+```
+
 # 添加存储设备:
 ### Url: http://118.24.161.188:8889/add_storage_device
 ### 请求方式: POST

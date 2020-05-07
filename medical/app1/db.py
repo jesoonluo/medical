@@ -59,6 +59,39 @@ def init_node_room():
         return None
     return new_first_node
 
+def rename_unit_db(uid, new_name, dtype):
+    #判断该room下是否存在别的空间或是存储设备
+    if dtype == 'folder':
+        room = room.objects.filter(id=uid).first()
+        if not room:
+             return {'success': False, 'msg': u'空间不存在', 'code': 302}
+        try:
+            room.objects(id=uid).update(name=new_name)
+            log = _insert_log('room', 'update', str(uid), 'update_name')
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'更新失败,数据库错误', 'code': 301}
+    elif dtype == 'storage':
+        store = storage_device.objects.filter(id=uid).first()
+        if not store:
+             return {'success': False, 'msg': u'设备不存在', 'code': 302}
+        try:
+            storage_device.objects(id=uid).update(storagename=new_name)
+            log = _insert_log('storage_device', 'update', str(uid), 'update_name')
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'更新失败,数据库错误', 'code': 301}
+    elif dtype == 'freeze_shelf':
+        shelf = freeze_shelf.objects.filter(id=uid).first()
+        if not shelf:
+             return {'success': False, 'msg': u'冻存架不存在', 'code': 302}
+        try:
+            freeze_shelf.objects(id=uid).update(shelfname=new_name)
+            log = _insert_log('freeze_shelf', 'update', str(uid), 'update_name')
+            return {'success': True, 'msg': u'', 'code':200}
+        except:
+            return {'success': False, 'msg': u'更新失败,数据库错误', 'code': 301}
+
 def delete_unit_db(uid, dtype):
     #判断该room下是否存在别的空间或是存储设备
     if dtype == 'folder':
@@ -73,8 +106,9 @@ def delete_unit_db(uid, dtype):
         except:
             return {'success': False, 'msg': u'删除失败,数据库错误', 'code': 301}
     elif dtype == 'storage':
+        store = storage_device.objects.filter(id=uid).first()
         child_shelf = freeze_shelf.objects.filter(storageid=uid).all()
-        if child_shelf:
+        if child_shelf or (not store):
              return {'success': False, 'msg': u'该空间下存在未删除子集', 'code': 302}
         try:
             storage_device.objects.filter(id=uid).delete()
@@ -84,7 +118,8 @@ def delete_unit_db(uid, dtype):
             return {'success': False, 'msg': u'删除失败,数据库错误', 'code': 301}
     elif dtype == 'freeze_shelf':
         child_shelf = freeze_box.objects.filter(shelfid=uid).all()
-        if child_shelf:
+        shelf = freeze_shelf.objects.filter(id=uid).first()
+        if child_shelf or (not shelf):
              return {'success': False, 'msg': u'该空间下存在未删除子集', 'code': 302}
         try:
             freeze_shelf.objects.filter(id=uid).delete()
@@ -126,16 +161,17 @@ def update_unit_db(uid, new_parent_id, dtype):
 
 def _copy_name(old_name):
     new_name = old_name
-    if old_name.endswith(')'):
+    print('old_name:', old_name)
+    if old_name.endswith(")"):
         try:
             order = int(old_name[-2])
             new_order = order + 1
-            new_name = order.split('(')[0] + str(new_order) + ')'
+            new_name = old_name.split('(')[0] + '(' + str(new_order) + ')'
         except:
             new_name = old_name + '(1)'
     else:
         new_name = old_name + '(1)'
-    return 
+    return new_name
         
 def _copy_unit(obj, table, parent_id):
     new_id = None
@@ -186,14 +222,14 @@ def copy_unit_view(uid, new_parent_id, dtype):
         uparent = room.objects.filter(id=new_parent_id).first()
         if not uparent:
              return {'success': False, 'msg': u'新父节点不存在', 'code': 302}
-        room = room.objects.filter(id=uid).first()
-        new_room_id = _copy_unit(room,'room', str(room.parent_id))
+        old_room = room.objects.filter(id=uid).first()
+        new_room_id = _copy_unit(old_room,'room', str(room.parent_id))
         # 复制room下冰箱
-        stores = query_storage_device_by_room_id(room.id)
+        stores = query_storage_device_by_room_id(str(room.id))
         for store in stores:
             new_store_id = _copy_unit(store,'storage', new_room_id)
             # 复制设备下冻存架
-            shelfs = query_freeze_shelf_by_store_id(store.id)
+            shelfs = query_freeze_shelf_by_store_id(str(store.id))
             for shelf in shelfs:
                 new_shelf_id = _copy_unit(shelf,'shelf', new_store_id)
                 # 复制冻存架下面冻存盒
@@ -207,11 +243,11 @@ def copy_unit_view(uid, new_parent_id, dtype):
         store = storage_device.objects.filter(id=uid).first()
         new_store_id = _copy_unit(store,'storage', new_parent_id)
         # 复制设备下冻存架
-        shelfs = query_freeze_shelf_by_store_id(store.id)
+        shelfs = query_freeze_shelf_by_store_id(str(store.id))
         for shelf in shelfs:
             new_shelf_id = _copy_unit(shelf,'shelf', new_store_id)
             # 复制冻存架下面冻存盒
-            boxs = query_boxs_by_shelf_id(shelf.id)
+            boxs = query_boxs_by_shelf_id(str(shelf.id))
             for box in boxs:
                 new_box_id = _copy_unit(box,'box', new_shelf_id)
     elif dtype == 'freeze_shelf':

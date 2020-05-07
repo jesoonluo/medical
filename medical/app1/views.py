@@ -58,6 +58,18 @@ def copy_unit(request):
     rst = copy_unit_view(uid, new_parent_id , dtype)
     return JsonResponse(rst)
 
+@csrf_exempt
+def rename_unit(request):
+    uid = request.POST.get('uid', '')
+    new_name = request.POST.get('new_name', '')
+    dtype = request.POST.get('dtype', '')
+    if not (uid and new_name):
+        return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_name不存在'})
+    if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf'):
+        return JsonResponse({'success': False, 'code': 201, 'msg': "dtype格式不正确,必须为('folder', 'storage', 'freeze_shelf')"})
+    rst = rename_unit_db(uid, new_name , dtype)
+    return JsonResponse(rst)
+
 #@check_login
 def query_all_node(request):
     ''' 获取所有节点 '''
