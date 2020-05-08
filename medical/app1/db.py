@@ -39,16 +39,16 @@ def _insert_log(table, op_type, op_id, desc_id='', desc_text=''):
         return False
     return True
 
-def check_name(new_name, dtype):
+def check_name(new_name, dtype, parent_id):
     obj = None
     if dtype == 'room':
-        obj = room.objects.filter(name=new_name).first()
+        obj = room.objects.filter(name=new_name).filter(parent_id=parent_id).first()
     elif dtype == 'storage':
-        obj = storage_device.objects.filter(storagename=new_name).first()
+        obj = storage_device.objects.filter(storagename=new_name).filter(room_id=parent_id).first()
     elif dtype == 'freeze_shelf':
-        obj = freeze_shelf.objects.filter(shelfname=new_name).first()
+        obj = freeze_shelf.objects.filter(shelfname=new_name).filter(storageid=parent_id).first()
     elif dtype == 'freeze_box':
-        obj = freeze_box.objects.filter(boxname=new_name).first()
+        obj = freeze_box.objects.filter(boxname=new_name).filter(shelfid=parent_id).first()
     if obj:
         return True
     return False

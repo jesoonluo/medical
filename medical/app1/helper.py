@@ -54,22 +54,22 @@ def query_code_name_by_type(idx, code_method, line, column, storage):
 
 def format_shelf_list(shelf_style, code_method, line, column, shelf_id):
     rst = []
-    if code_method == '1': 
-        code_list = _shelf_code_method(line, column, shelf_style[0],shelf_style[1],shelf_style[2])
-        for i in code_list:
-            foo_list = []
-            for j in i:
-                foo = {}
-                foo['percent'] = 0
-                foo['name'] = j
-                foo['dname'] = ''
-                exist_child = query_item_by_code_by_id('shelf', str(shelf_id), j)
-                if exist_child:
-                    foo['id'] = str(exist_child['id'])
-                    foo['percent'] = 1
-                    foo['dname'] = exist_child['boxname']
-                foo_list.append(foo)
-            rst.append(foo_list)
+    code_list = _shelf_code_method(line, column, shelf_style[0],shelf_style[1],shelf_style[2], code_method)
+    for i in code_list:
+        foo_list = []
+        for j in i:
+            foo = {}
+            foo['percent'] = 0
+            foo['name'] = j
+            foo['dname'] = ''
+            exist_child = query_item_by_code_by_id('shelf', str(shelf_id), j)
+            if exist_child:
+                foo['id'] = str(exist_child['id'])
+                foo['percent'] = 1
+                foo['dname'] = exist_child['boxname']
+            foo_list.append(foo)
+        rst.append(foo_list)
+    '''
     else:
         for i in range(int(line)):
             foo_list = []
@@ -77,6 +77,8 @@ def format_shelf_list(shelf_style, code_method, line, column, shelf_id):
                 foo = {}
                 code_name = query_code_name_by_type(i*int(column)+j, code_method, line, column, 'freeze_shelf')
                 foo['name'] = code_name
+                foo['percent'] = 0
+                foo['dname'] = ''
                 #添加具体信息
                 exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(code_name))
                 if exist_child:
@@ -85,6 +87,7 @@ def format_shelf_list(shelf_style, code_method, line, column, shelf_id):
                     foo['dname'] = exist_child['boxname']
                 foo_list.append(foo)
             rst.append(foo_list)
+    '''
     return rst
 
 def format_box_list(code_method, line, column, box_id):
@@ -156,10 +159,11 @@ def _get_percent(obj, utable):
     return round(exist_items/all_items*100)
 
 
-def _shelf_code_method(line, column, rule1,rule2,rule3):
+def _shelf_code_method(line, column, rule1,rule2,rule3, code_method):
     # rule1 -> 横纵转换
     # rule2 -> 左右
     # rule3 -> 上下
+    en_ch = {'1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H', '9': 'I', '10': 'J', '11': 'K', '12': 'L', '13': 'M', '14': 'N'}
     line = int(line)
     column = int(column)
     rst = []
@@ -168,6 +172,10 @@ def _shelf_code_method(line, column, rule1,rule2,rule3):
             foo = []
             for j in range(1,column+1):
                 unit = i*int(column)+j
+                if code_method == '2':
+                    unit = str(i+1) + str(unit)
+                elif code_method == '3':
+                    unit = en_ch.get(str(i+1)) + str(unit)
                 foo.append(unit)
             if rule2 == 'B':
                 foo.sort(reverse=True)
@@ -177,6 +185,10 @@ def _shelf_code_method(line, column, rule1,rule2,rule3):
             foo = []
             for j in range(column):
                 unit = j*int(line)+i
+                if code_method == '2':
+                    unit = str(i) + str(unit)
+                elif code_method == '3':
+                    unit = en_ch.get(str(i)) + str(unit)
                 foo.append(unit)
             if rule2 == 'B':
                 foo.sort(reverse=True)

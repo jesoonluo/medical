@@ -231,10 +231,10 @@ def query_box_by_shelf_id(shelf_id):
 @csrf_exempt
 def add_new_room(request):
     name = request.POST['name']
-    if check_name(name, 'room'):
+    parent_id = request.POST['parent_id']
+    if check_name(name, 'room', parent_id):
         return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     rank = request.POST['rank']
-    parent_id = request.POST['parent_id']
     all_room_ids = query_all_room_ids()
     msg = ''
     if parent_id not in all_room_ids:
@@ -268,12 +268,12 @@ def add_storage_N2(request):
     ''' 添加液氮罐 '''
     print('*'*10, dict(request.POST))
     name = request.POST['name']
-    if check_name(name, 'storage'):
+    room_id = request.POST['parent_id']
+    if check_name(name, 'room', room_id):
         return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     terminalname = ''
     storageid = request.POST['storage_id']
     rank = request.POST['rank']
-    room_id = request.POST['parent_id']
     utype = request.POST.get('utype','1')         # 液氮罐编码方式默认为1?
     dtype = request.POST['dtype']
     storageline = 1                               # 冻存架数量
@@ -309,13 +309,13 @@ def add_storage_N2(request):
 def add_new_storage_device(request):
     ''' 添加新的设备 '''
     print('*'*10, dict(request.POST))
+    room_id = request.POST['parent_id']
     name = request.POST['name']
-    if check_name(name, 'storage'):
+    if check_name(name, 'storage', room_id):
         return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     terminalname = request.POST['terminal_name']
     storageid = request.POST['storage_id']
     rank = request.POST['rank']
-    room_id = request.POST['parent_id']
     utype = request.POST['utype']
     dtype = request.POST['dtype']
     storageline = request.POST['storageline']     # 行数
@@ -353,12 +353,12 @@ def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
     print('*'*10, dict(request.POST))
     shelfname = request.POST['name']
-    if check_name(shelfname, 'freeze_shelf'):
+    store_id = request.POST['parent_id']      # 存储设备id
+    if check_name(shelfname, 'freeze_shelf', store_id):
         return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     rank = request.POST['rank']
     shelfline = request.POST['shelfline']     # 行数
     shelfcolumn = request.POST['shelfcolumn'] # 列数
-    store_id = request.POST['parent_id']      # 存储设备id
     hands_direction = request.POST['hands_direction']  # 拉手方向
     utype = request.POST['utype']             # 冻存架排列方式(1->正序,2->逆序)
     dtype = request.POST['dtype']             # 冻存架类别
@@ -401,12 +401,12 @@ def add_new_freeze_shelf(request):
 def add_new_freeze_box(request):
     ''' 添加新的冻存盒 '''
     name = request.POST['name']
-    if check_name(name, 'freeze_box'):
+    shelf_id = request.POST['parent_id']       # 冻存架id
+    if check_name(name, 'freeze_box', shelf_id):
         return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     rank = request.POST['rank']
     boxline = request.POST['boxline']         # 行数
     boxcolumn = request.POST['boxcolumn']     # 列数
-    shelf_id = request.POST['parent_id']       # 冻存架id
     utype = request.POST['utype']             # 冻存盒排列方式(1,2,3)
     dtype = request.POST['dtype']             # 冻存架类别
     msg = ''
