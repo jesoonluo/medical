@@ -178,20 +178,23 @@ def _shelf_code_method(line, column, rule1,rule2,rule3, code_method):
                     unit = en_ch.get(str(i+1)) + str(unit)
                 foo.append(unit)
             if rule2 == 'B':
-                foo.sort(reverse=True)
+                foo.reverse()
             rst.append(foo)
     elif rule1 == 'B':
         for i in range(1,line+1):
             foo = []
             for j in range(column):
-                unit = j*int(line)+i
-                if code_method == '2':
-                    unit = str(i) + str(unit)
+                foo_unit = j*int(line)+i
+                if code_method == '1':
+                    foo.append(foo_unit)
+                elif code_method == '2':
+                    ustr = str(i) + str(foo_unit)
+                    foo.append(ustr)
                 elif code_method == '3':
-                    unit = en_ch.get(str(i)) + str(unit)
-                foo.append(unit)
+                    ustr = en_ch.get(str(i)) + str(foo_unit)
+                    foo.append(ustr)
             if rule2 == 'B':
-                foo.sort(reverse=True)
+                foo.reverse()
             rst.append(foo)
     if rule3 == 'B':
         # 外层倒序
