@@ -76,8 +76,8 @@ def init_node_room():
 def rename_unit_db(uid, new_name, dtype):
     #判断该room下是否存在别的空间或是存储设备
     if dtype == 'folder':
-        room = room.objects.filter(id=uid).first()
-        if not room:
+        new_room = room.objects.filter(id=uid).first()
+        if not new_room:
              return {'success': False, 'msg': u'空间不存在', 'code': 302}
         try:
             room.objects(id=uid).update(name=new_name)
@@ -211,14 +211,39 @@ def _copy_name(old_name):
     else:
         new_name = old_name + '(1)'
     return new_name
+
+def is_exist_name_by_table_parent_id(table, parent_id, name):
+    name_list = []
+    if table == 'room':
+        room_objs = room.objects.filter(parent_id=parent_id)
+        name_list = [i.name for i in room_objs]    
+    elif table == 'storage':
+        store_objs = storage_device.objects.filter(room_id=parent_id)
+        name_list = [i.storagename for i in store_objs]    
+    elif table == 'shelf':
+        shelf_objs = freeze_shelf.objects.filter(storageid=parent_id)
+        name_list = [i.shelfname for i in shelf_objs]    
+    elif table == 'box':
+        box_objs = freeze_box.objects.filter(shelfid=parent_id)
+        name_list = [i.boxname for i in box_objs]    
+    if name in name_list:
+        return True
+    else:
+        return False
         
-def _copy_unit(obj, table, parent_id, new_position):
+def _copy_unit(obj, table, parent_id, new_position=None):
     new_id = None
     if table == 'room':
-        new_id = add_room(_copy_name(obj.name), obj.rank, parent_id)
+        new_name = obj.name
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.name):
+            new_name = _copy_name(obj.name)
+        new_id = add_room(new_name, obj.rank, parent_id)
     elif table == 'storage':
+        new_name = obj.storagename
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.storagename):
+            new_name = _copy_name(obj.storagename)
         new_id = add_new_storage(
-            _copy_name(obj.storagename),
+            new_name,
             obj.terminalname,
             obj.storageid,
             obj.storagetype,
@@ -229,11 +254,14 @@ def _copy_unit(obj, table, parent_id, new_position):
             obj.storagecolumn
         )
     elif table == 'shelf':
+        new_name = obj.shelfname
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.shelfname):
+            new_name = _copy_name(obj.shelfname)
         new_id = add_freeze_shelf(
-            _copy_name(obj.shelfname),
+            new_name,
             obj.shelftype,
             obj.detailtype,
-            new_position,
+            new_position if new_position else obj.shelforder,
             obj.rank,
             parent_id,
             obj.hands_direction,
@@ -241,12 +269,15 @@ def _copy_unit(obj, table, parent_id, new_position):
             obj.shelfcolumn
         )
     elif table == 'box':
+        new_name = obj.boxname
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.boxname):
+            new_name = _copy_name(obj.boxname)
         new_id = add_freeze_box(
-            _copy_name(obj.boxname),
+            new_name,
             obj.boxid,
             obj.boxtype,
             obj.detailtype,
-            new_position,
+            new_position if new_position else obj.boxorder,
             obj.rank,
             parent_id,
             obj.boxnote,
@@ -295,7 +326,7 @@ def copy_unit_view(uid, new_parent_id, dtype, new_postion):
              return {'success': False, 'msg': u'设备不存在', 'code': 302}
         shelf = freeze_shelf.objects.filter(id=uid).first()
         new_shelf_id = _copy_unit(shelf,'shelf', new_parent_id, new_postion)
-        boxs = query_boxs_by_shelf_id(new_shelf_id)
+        boxs = query_boxs_by_shelf_id(uid)
         for box in boxs:
             new_box_id = _copy_unit(box,'box', new_shelf_id)
     elif dtype == 'freeze_box':

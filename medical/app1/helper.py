@@ -62,7 +62,7 @@ def format_shelf_list(shelf_style, code_method, line, column, shelf_id):
             foo['percent'] = 0
             foo['name'] = j
             foo['dname'] = ''
-            exist_child = query_item_by_code_by_id('shelf', str(shelf_id), j)
+            exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(j))
             if exist_child:
                 foo['id'] = str(exist_child['id'])
                 foo['percent'] = 1

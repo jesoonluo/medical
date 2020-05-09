@@ -19,7 +19,8 @@ def check_login(func):
     return inner
 
 def index(request):
-    return render(request, 'public/index.html')
+    request.META["CSRF_COOKIE_USED"] = False
+    return render(request,'index.html')
     
 @csrf_exempt
 def delete_unit(request):
@@ -70,6 +71,20 @@ def rename_unit(request):
     uid = request.POST.get('uid', '')
     new_name = request.POST.get('new_name', '')
     dtype = request.POST.get('dtype', '')
+    parent_id = request.POST.get('parent_id', '')
+    # 重名检测
+    if dtype == 'folder':
+        if check_name(new_name, 'room', parent_id):
+            return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
+    elif dtype == 'storage':
+        if check_name(new_name, 'storage', parent_id):
+            return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
+    elif dtype == 'freeze_shelf':
+        if check_name(new_name, 'freeze_shelf', parent_id):
+            return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
+    elif dtype == 'freeze_box':
+        if check_name(new_name, 'freeze_box', parent_id):
+            return JsonResponse({'success': False, 'code': 301, 'msg': '名字不能重复'})
     if not (uid and new_name):
         return JsonResponse({'success': False, 'code': 201, 'msg': '参数uid或new_name不存在'})
     if not dtype or dtype not in ('folder', 'storage', 'freeze_shelf', 'freeze_box'):
