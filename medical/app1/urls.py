@@ -17,4 +17,5 @@ urlpatterns = [
     path('add_freeze_shelf',views.add_new_freeze_shelf),
     path('add_freeze_box',views.add_new_freeze_box),
     path('index/',views.index),
+    #**url(r'^$', TemplateView.as_view(template_name="index.html")),**
 ]
