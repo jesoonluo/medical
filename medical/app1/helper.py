@@ -4,10 +4,10 @@ from .db import query_item_by_code_by_id
 
 def mongo_to_dict_helper(obj):
     return_data = []
-    for field_name in obj._fields:
+    for field_name,data in obj.items():
         #if field_name in ("id",):
         #    continue
-        data = obj._data[field_name]
+        #data = obj._data[field_name]
         if isinstance(obj._fields[field_name], ObjectIdField):
             return_data.append((field_name, str(data)))
         elif isinstance(obj._fields[field_name], StringField):
@@ -17,7 +17,7 @@ def mongo_to_dict_helper(obj):
         elif isinstance(obj._fields[field_name], IntField):
             return_data.append((field_name, int(data)))
         elif isinstance(obj._fields[field_name], ListField):
-            return_data.append((field_name, int(data)))
+            return_data.append((field_name, list(data)))
         else:
             # You can define your logic for returning elements
             pass
@@ -52,7 +52,7 @@ def query_code_name_by_type(idx, code_method, line, column, storage):
     return code_name
         
 
-def format_shelf_list(shelf_style, code_method, line, column, shelf_id):
+def format_shelf_list(shelf_style, code_method, line, column, shelf_id, db):
     rst = []
     code_list = _shelf_code_method(line, column, shelf_style[0],shelf_style[1],shelf_style[2], code_method)
     for i in code_list:
@@ -62,11 +62,11 @@ def format_shelf_list(shelf_style, code_method, line, column, shelf_id):
             foo['percent'] = 0
             foo['name'] = j
             foo['dname'] = ''
-            exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(j))
+            exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(j), db)
             if exist_child:
-                foo['id'] = str(exist_child['id'])
+                foo['id'] = str(exist_child.id)
                 foo['percent'] = 1
-                foo['dname'] = exist_child['boxname']
+                foo['dname'] = exist_child.boxname
             foo_list.append(foo)
         rst.append(foo_list)
     '''
@@ -105,26 +105,26 @@ def format_box_list(code_method, line, column, box_id):
         rst.append(foo)
     return rst
 
-def format_storage_list(code_method, line, column, storage, parent_id, utable):
+def format_storage_list(code_method, line, column, storage, parent_id, utable, db):
     rst = []    
     exist_item = 0
     if storage.startswith("yedanguan"):
-        for i in range(column):
+        for i in range(int(column)):
             foo = {}
             code_name = query_code_name_by_type(i, code_method, line, column, storage)
             foo['name'] = code_name
-            exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name))
+            exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name), db)
             foo['percent'] = 0
             foo['dname'] = ''
             if exist_child:
                 exist_item += 1
-                foo['id'] = str(exist_child['id'])
+                foo['id'] = str(exist_child.id)
                 #foo['percent'] = _get_percent(exist_child, utable)
                 foo['percent'] = 1
                 if utable == 'storage':
-                    foo['dname'] = exist_child['shelfname']
+                    foo['dname'] = exist_child.shelfname
                 elif utable == 'shelf':
-                    foo['dname'] = exist_child['boxname']
+                    foo['dname'] = exist_child.boxname
             rst.append(foo)
         return rst
     for i in range(int(line)):
@@ -134,17 +134,17 @@ def format_storage_list(code_method, line, column, storage, parent_id, utable):
             code_name = query_code_name_by_type(i*int(column)+j, code_method, line, column, storage)
             foo['name'] = code_name
             #添加具体信息
-            exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name))
+            exist_child = query_item_by_code_by_id(utable, str(parent_id), str(code_name), db)
             foo['percent'] = 0
             foo['dname'] = ''
             if exist_child:
                 exist_item += 1
-                foo['id'] = str(exist_child['id'])
+                foo['id'] = str(exist_child.id)
                 foo['percent'] = 1
                 if utable == 'storage':
-                    foo['dname'] = exist_child['shelfname']
+                    foo['dname'] = exist_child.shelfname
                 elif utable == 'shelf':
-                    foo['dname'] = exist_child['boxname']
+                    foo['dname'] = exist_child.boxname
             foo_list.append(foo)
         rst.append(foo_list)
     return rst

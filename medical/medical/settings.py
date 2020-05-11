@@ -117,7 +117,7 @@ DATABASES = {
     }
 }
 from mongoengine import connect
-connect('test',host='localhost',port=27017,username='',password='',authentication_source='admin')
+connect(alias='default',db='test',host='localhost',port=27017,username='',password='',authentication_source='admin')
 
 
 # Password validation
