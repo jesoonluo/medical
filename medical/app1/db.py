@@ -49,7 +49,7 @@ def _update_by_id(collection, _id, data, db=None):
 
 
 def _find_all(collection, query={}, db=None):
-    return [obj(i) for i in mg[db][collection].find(query) if i ]
+    return [obj(i) for i in mg[db][collection].find(query) if i]
 
 def _find_by_id(collection, _id, db=None):
     item = mg[db][collection].find_one({'_id': ObjectId(_id)})
@@ -281,16 +281,16 @@ def is_exist_name_by_table_parent_id(table, parent_id, name, db):
     else:
         return False
         
-def _copy_unit(obj, table, parent_id, new_position=None, db=None):
+def _copy_unit(obj, table, parent_id, db=None, new_position=None):
     new_id = None
     if table == 'room':
         new_name = obj.name
-        if is_exist_name_by_table_parent_id(table, parent_id, obj.name):
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.name, db):
             new_name = _copy_name(obj.name)
         new_id = add_room(new_name, obj.rank, parent_id, db)
     elif table == 'storage':
         new_name = obj.storagename
-        if is_exist_name_by_table_parent_id(table, parent_id, obj.storagename):
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.storagename, db):
             new_name = _copy_name(obj.storagename)
         new_id = add_new_storage(
             new_name,
@@ -306,7 +306,7 @@ def _copy_unit(obj, table, parent_id, new_position=None, db=None):
         )
     elif table == 'shelf':
         new_name = obj.shelfname
-        if is_exist_name_by_table_parent_id(table, parent_id, obj.shelfname):
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.shelfname, db):
             new_name = _copy_name(obj.shelfname)
         new_id = add_freeze_shelf(
             new_name,
@@ -322,7 +322,7 @@ def _copy_unit(obj, table, parent_id, new_position=None, db=None):
         )
     elif table == 'box':
         new_name = obj.boxname
-        if is_exist_name_by_table_parent_id(table, parent_id, obj.boxname):
+        if is_exist_name_by_table_parent_id(table, parent_id, obj.boxname, db):
             new_name = _copy_name(obj.boxname)
         new_id = add_freeze_box(
             new_name,
@@ -360,7 +360,7 @@ def copy_unit_view(uid, new_parent_id, dtype, new_postion, db):
                 for box in boxs:
                     new_box_id = _copy_unit(box,'box', new_shelf_id, db)
     elif dtype == 'storage':
-        uroom = _find_by_id('room', parent_id, db)
+        uroom = _find_by_id('room', new_parent_id, db)
         if not uroom:
              return {'success': False, 'msg': u'空间不存在', 'code': 302}
         store = _find_by_id('storage_device', uid, db)
@@ -378,16 +378,16 @@ def copy_unit_view(uid, new_parent_id, dtype, new_postion, db):
         if not ustorage:
              return {'success': False, 'msg': u'设备不存在', 'code': 302}
         shelf = _find_by_id('freeze_shelf', uid, db)
-        new_shelf_id = _copy_unit(shelf,'shelf', new_parent_id, new_postion, db)
+        new_shelf_id = _copy_unit(shelf,'shelf', new_parent_id, db, new_postion)
         boxs = query_boxs_by_shelf_id(uid, db)
         for box in boxs:
-            new_box_id = _copy_unit(box,'box', new_shelf_id, db)
+            new_box_id = _copy_unit(box, 'box', new_shelf_id, db)
     elif dtype == 'freeze_box':
         shelf = _find_by_id('freeze_shelf', new_parent_id, db)
         if not shelf:
              return {'success': False, 'msg': u'冻存架不存在', 'code': 302}
         box = _find_by_id('freeze_box', uid, db)
-        new_box = _copy_unit(box,'box', new_parent_id, new_postion, db)
+        new_box = _copy_unit(box,'box', new_parent_id, db, new_postion)
     return {'success': True, 'msg': u'', 'code':200}
     #except:
     #   return {'success': False, 'msg': u'复制失败,数据库错误', 'code': 301}
@@ -435,7 +435,7 @@ def add_new_storage(storagename,terminalname,storageid,utype,dtype,rank,room_id,
         return None
     return str(insert_id)
 
-def add_freeze_shelf(shelfname,utype,dtype,shelforder,rank,storage_id,hands_direction,shelfline=10,shelfcolumn=10,shelf_style='AAA',db=None):
+def add_freeze_shelf(shelfname,utype,dtype,shelforder,rank,storage_id,hands_direction,shelfline=10,shelfcolumn=10,db=None,shelf_style='AAA'):
     data = dict(
         shelfname = shelfname,
         shelftype = utype,
