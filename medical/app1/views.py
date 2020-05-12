@@ -120,7 +120,8 @@ def query_all_node(request):
     rst = {'store':[]}
     if not all_room:
         first_node = init_node_room(db)
-        rst['store'].append({k:v for k,v in first_node.items()})
+        first_room = query_all_room(db)[0]
+        rst['store'].append({k:v for k,v in first_room.items()})
     else:
         for room in all_room:
             uroom = {'dtype': '0'}
@@ -159,7 +160,8 @@ def query_all_node_new(request):
     rst = {'store':[]}
     if not all_room:
         first_node = init_node_room(db)
-        rst['store'].append({k:v for k,v in first_node.items()})
+        first_room = query_all_room(db)[0]
+        rst['store'].append({k:v for k,v in first_room.items()})
     else:
         for room in all_room:
             uroom = {'dtype': '0'}
@@ -433,7 +435,7 @@ def add_new_freeze_shelf(request):
     #shelfs = query_freeze_shelf_by_store_id(store_id)
     # TODO根据冻存架type,确定排列位子
     # shelf_order = query_code_name_by_type(len(shelfs), storage.utype, storage.storageline, storage.storagecolumn, storage.detailtype )
-    flag = add_freeze_shelf(shelfname,utype,dtype,shelf_order,rank,store_id,hands_direction,shelfline,shelfcolumn,shelf_style,db)
+    flag = add_freeze_shelf(shelfname,utype,dtype,shelf_order,rank,store_id,hands_direction,shelfline,shelfcolumn,db,shelf_style)
     if flag:
         rst = {
              'success': flag,

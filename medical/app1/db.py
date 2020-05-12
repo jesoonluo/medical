@@ -18,7 +18,7 @@ class obj(object):
     def items(self):
         my_d = self.my_d
         my_d['id'] = str(my_d['_id'])
-        my_d['_id'] = str(my_d['_id'])
+        del my_d['_id']
         return my_d.items()
         
 
@@ -112,7 +112,8 @@ def init_node_room(db):
     data = dict(
         name = '全部空间',
         rank = 1,                   #层级
-        parent_id = '0'                   #根节点
+        parent_id = '0',            #根节点
+        roomtype = 'folder'
     )
     insert_id = ""
     try:
