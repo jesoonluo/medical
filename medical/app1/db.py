@@ -525,6 +525,8 @@ def add_sample(sample_id, box_id, sample_order, db, phone, username, sample_name
     try:
         insert_id = _insert_one('sample', data, db)
         log = _insert_log(db, 'sample', 'add', str(insert_id))
+        # TODO在此更新原库数据条目
+        _update_by_id('level3mp', str(sample_id), {"if_bound": 1, "box_id": box_id, "orderid": sample_order}, db)
         sample_log = _insert_sample_log(
             db=db, 
             old_box_id='', 
