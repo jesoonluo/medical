@@ -31,7 +31,9 @@ def index(request):
     request.META["CSRF_COOKIE_USED"] = False
     return render(request,'index.html')
 
-#@query_own_db    
+def test(request):
+    return render(request,'test.html')
+
 @csrf_exempt
 def delete_unit(request):
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -45,7 +47,6 @@ def delete_unit(request):
     rst = delete_unit_db(uid, dtype, db)
     return JsonResponse(rst)
 
-#@query_own_db    
 @csrf_exempt
 def update_unit(request):
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -81,7 +82,6 @@ def copy_unit(request):
     rst = copy_unit_view(uid, new_parent_id , dtype, new_postion, db)
     return JsonResponse(rst)
 
-#@query_own_db    
 @csrf_exempt
 def rename_unit(request):
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -110,8 +110,6 @@ def rename_unit(request):
     rst = rename_unit_db(uid, new_name , dtype, db)
     return JsonResponse(rst)
 
-#@query_own_db    
-@query_own_db    
 def query_all_node(request):
     ''' 获取所有节点 '''
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -121,7 +119,13 @@ def query_all_node(request):
     if not all_room:
         first_node = init_node_room(db)
         first_room = query_all_room(db)[0]
-        rst['store'].append({k:v for k,v in first_room.items()})
+        uroom = {'dtype': '0'}
+        for k,v in first_room.items():
+            if k != 'roomtype':
+                uroom[k] = v
+            else:
+                uroom['utype'] = v
+        rst['store'].append(uroom)
     else:
         for room in all_room:
             uroom = {'dtype': '0'}
@@ -151,7 +155,6 @@ def query_all_node(request):
                 rst['store'].append(ustore)
     return JsonResponse(rst)
 
-#@query_own_db    
 def query_all_node_new(request):
     ''' 获取所有节点 '''
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -161,7 +164,13 @@ def query_all_node_new(request):
     if not all_room:
         first_node = init_node_room(db)
         first_room = query_all_room(db)[0]
-        rst['store'].append({k:v for k,v in first_room.items()})
+        uroom = {'dtype': '0'}
+        for k,v in first_room.items():
+            if k != 'roomtype':
+                uroom[k] = v
+            else:
+                uroom['utype'] = v
+        rst['store'].append(uroom)
     else:
         for room in all_room:
             uroom = {'dtype': '0'}
@@ -198,7 +207,6 @@ def query_all_node_new(request):
                         rst['store'].append(box)
     return JsonResponse(rst)
 
-#@query_own_db    
 def query_shelf_by_storage_id(request):
     ''' 获取所有节点 '''
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -228,7 +236,6 @@ def query_shelf_by_storage_id(request):
             rst['box_list'].append(box)
     return JsonResponse(rst)
 
-#@query_own_db    
 def query_shelf_by_storage_id_own(storage_id, db):
     #通过设备id获取冻存架
     rst = []
@@ -251,15 +258,12 @@ def query_shelf_by_storage_id_own(storage_id, db):
         rst.append(foo)
     return rst
 
-#@query_own_db    
 def query_box_by_shelf_id(shelf_id, db):
-    #通过冻存架id获取冻存盒
-    # db = json.loads(request.COOKIES.get('dbname'))
     rst = []
     freeze_boxs = query_boxs_by_shelf_id(shelf_id, db)
     for box in freeze_boxs:
         foo = {}
-        format_list = format_box_list(box.boxtype, box.boxline, box.boxcolumn, box.id)
+        format_list = format_box_list(box.boxtype, box.boxline, box.boxcolumn, box.id, db)
         foo['box'] = format_list
         for k,v in box.items():
             if k not in ('boxtype','shelfid','boxname','detailtype'):
@@ -275,7 +279,6 @@ def query_box_by_shelf_id(shelf_id, db):
         rst.append(foo)
     return rst
 
-#@query_own_db    
 @csrf_exempt
 def add_new_room(request):
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -313,7 +316,6 @@ def add_new_room(request):
          }
          return JsonResponse(rst)
 
-#@query_own_db    
 @csrf_exempt
 def add_storage_N2(request):
     ''' 添加液氮罐 '''
@@ -357,7 +359,6 @@ def add_storage_N2(request):
          }
          return JsonResponse(rst)
 
-#@query_own_db    
 @csrf_exempt
 def add_new_storage_device(request):
     ''' 添加新的设备 '''
@@ -402,7 +403,6 @@ def add_new_storage_device(request):
          return JsonResponse(rst)
     
 
-#@query_own_db    
 @csrf_exempt
 def add_new_freeze_shelf(request):
     ''' 添加新的冻存架 '''
@@ -424,13 +424,13 @@ def add_new_freeze_shelf(request):
     msg = ''
     storage = query_storage_by_id(store_id,db)
     if not storage:
-         msg = u'存储设备不存在,请确认'
-         rst = {
-             'success': False,
-             'code': 304,
-             'msg': msg
-         }
-         return JsonResponse(rst)
+        msg = u'存储设备不存在,请确认'
+        rst = {
+            'success': False,
+            'code': 304,
+            'msg': msg
+        }
+        return JsonResponse(rst)
     # 获取已经存在的冻存架数
     #shelfs = query_freeze_shelf_by_store_id(store_id)
     # TODO根据冻存架type,确定排列位子
@@ -444,16 +444,15 @@ def add_new_freeze_shelf(request):
         }
         return JsonResponse(rst)
     else:
-         msg = u'创建失败，数据库错误'
-         rst = {
-             'success': False,
-             'code': 301,
-             'msg': msg
-         }
-         return JsonResponse(rst)
+        msg = u'创建失败，数据库错误'
+        rst = {
+            'success': False,
+            'code': 301,
+            'msg': msg
+        }
+        return JsonResponse(rst)
 
 
-#@query_own_db    
 @csrf_exempt
 def add_new_freeze_box(request):
     ''' 添加新的冻存盒 '''
@@ -471,13 +470,13 @@ def add_new_freeze_box(request):
     msg = ''
     shelf = query_shelf_by_id(shelf_id,db)
     if not shelf:
-         msg = u'冻存架不存在,请确认'
-         rst = {
-             'success': False,
-             'code': 304,
-             'msg': msg
-         }
-         return JsonResponse(rst)
+        msg = u'冻存架不存在,请确认'
+        rst = {
+            'success': False,
+            'code': 304,
+            'msg': msg
+        }
+        return JsonResponse(rst)
     # 获取已经存在的冻存盒数
     boxs = query_boxs_by_shelf_id(shelf_id,db)
     # TODO根据冻存架type,确定排列位子
@@ -494,10 +493,65 @@ def add_new_freeze_box(request):
         }
         return JsonResponse(rst)
     else:
-         msg = u'创建失败，数据库错误'
-         rst = {
-             'success': False,
-             'code': 301,
-             'msg': msg
-         }
-         return JsonResponse(rst)
+        msg = u'创建失败，数据库错误'
+        rst = {
+            'success': False,
+            'code': 301,
+            'msg': msg
+        }
+        return JsonResponse(rst)
+
+@csrf_exempt
+def add_sample_view(request):
+    # cookie 获取db, username, userphone
+    db = 'test'
+    phone = ''    
+    username = ''
+    data_list = json.loads(request.POST['data_list'])
+    if not isinstance(data_list, list):
+        msg = u'数据格式解析不正确'
+        rst = {
+            'success': False,
+            'code': 305,
+            'msg': msg
+        }
+        return JsonResponse(rst)
+       
+    for item in data_list:
+        box_id = item['box_id']
+        box = query_freeze_box_by_id(box_id, db)
+        if not box:
+            msg = u'冻存盒不存在,请确认'
+            rst = {
+                'success': False,
+                'code': 304,
+                'msg': msg
+            }
+            return JsonResponse(rst)
+        sample_id = item['sample_id']
+        sample_order =  item.get('name', '')
+        sample_name = item.get("sample_name", "")
+        add_rst = add_sample(sample_id, box_id, sample_order, db, phone, username, sample_name)
+        if not add_rst:
+            msg = u'添加样本失败'
+            rst = {
+                'success': False,
+                'code': 301,
+                'msg': msg
+            }
+            return JsonResponse(rst)
+    rst = {
+         'success': flag,
+         'code': 200,
+         'msg': msg
+    }
+    return JsonResponse(rst)
+
+def query_samples(request):
+    ''' 获取盒子下所有样本 '''
+    # db = json.loads(request.COOKIES.get('dbname'))
+    db = 'test'
+    box_id = request.GET['box_id']
+    samples = query_sample_by_box_id(box_id, db)
+    rst = {"samples": samples}
+    return JsonResponse(rst)

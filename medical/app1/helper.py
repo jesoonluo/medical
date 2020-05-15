@@ -2,6 +2,7 @@ from mongoengine import StringField,FloatField,IntField,ListField,ObjectIdField
 from .db import query_item_by_code_by_id
 
 
+
 def mongo_to_dict_helper(obj):
     return_data = []
     for field_name,data in obj.items():
@@ -90,7 +91,7 @@ def format_shelf_list(shelf_style, code_method, line, column, shelf_id, db):
     '''
     return rst
 
-def format_box_list(code_method, line, column, box_id):
+def format_box_list(code_method, line, column, box_id, db):
     code_list = [i for i in range(int(line)*int(column))]
     rst = []
     for i in range(int(line)*int(column)):
@@ -98,10 +99,10 @@ def format_box_list(code_method, line, column, box_id):
         foo['percent'] = 0
         code_name = str(i)
         foo['name'] = code_name
-        foo['dname'] = ''
-        #exist_child = query_item_by_code_by_id('shelf', str(shelf_id), str(code_name))
-        #if exist_child:
-        #    foo['id'] = str(exist_child['id'])
+        exist_child = query_item_by_code_by_id('box', str(box_id), str(code_name), db)
+        if exist_child:
+            foo['id'] = exist_child.sample_id
+            foo['dname'] = exist_child.sample_name
         rst.append(foo)
     return rst
 

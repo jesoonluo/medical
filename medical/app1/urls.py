@@ -7,6 +7,7 @@ urlpatterns = [
     path('query_node',views.query_all_node),
     path('query_all',views.query_all_node_new),
     path('query_shelfs',views.query_shelf_by_storage_id),
+    path('query_samples',views.query_samples),
     path('add_room',views.add_new_room),
     path('delete_unit',views.delete_unit),
     path('update_unit',views.update_unit),
@@ -16,6 +17,7 @@ urlpatterns = [
     path('add_storage_N2',views.add_storage_N2),
     path('add_freeze_shelf',views.add_new_freeze_shelf),
     path('add_freeze_box',views.add_new_freeze_box),
-    path('index/',views.index),
-    #**url(r'^$', TemplateView.as_view(template_name="index.html")),**
+    path('add_sample',views.add_sample_view),
+    path('test_code',views.test),
+    path('index',views.index),
 ]

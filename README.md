@@ -125,3 +125,15 @@ Param：{
     "box_note": "冻存盒描述",
 }
 ```
+
+# 添加样本:
+### Url: http://118.24.161.188:8889/add_sample
+### 请求方式: POST
+```json
+{
+    "data_list": [{"box_id": "冻存盒id", "sample_id": "样本id", "name":"box返回的order", "sample_name": "样本名字,可以不用传"},{}], 
+}
+```
+
+# 查询冻存盒下样本： 
+###  Url:  http://118.24.161.188:8889/query_samples?uid=冻存盒id

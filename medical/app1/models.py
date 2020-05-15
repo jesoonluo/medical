@@ -54,6 +54,23 @@ class freeze_box(mongoengine.Document):
     boxnote = mongoengine.StringField(max_length=256, default="")
     rank = mongoengine.IntField()                    # 层级
 
+class sample(mongoengine.Document):
+    # 样本表(血清之类的)
+    sample_name = mongoengine.StringField(max_length=16)
+    sample_id = mongoengine.StringField(max_length=64)
+    box_id = mongoengine.StringField(max_length=64)
+    sample_order = mongoengine.StringField(max_length=16)  #顺序号(用于存储样本的顺序)
+
+class sample_log(mongoengine.Document):
+    sample_id = mongoengine.StringField(max_length=64)           # 迁移样本id
+    old_box_id =  mongoengine.StringField(max_length=64)         # 旧冻存盒id            
+    old_box_order = mongoengine.StringField(max_length=16)    # 旧位置信息
+    new_box_id =  mongoengine.StringField(max_length=64)         # 新冻存盒id            
+    new_box_order = mongoengine.StringField(max_length=16)    # 新位置信息
+    op_user_phone = mongoengine.StringField(max_length=11)       # 迁移用户手机号
+    op_user_name = mongoengine.StringField(max_length=11)        # 迁移用户姓名
+    dt_create = mongoengine.DateTimeField(now_ts())              # 迁移时间
+
 class log_info(mongoengine.Document):
     operate_table = mongoengine.StringField(max_length=32) # 操作表
     operate_type = mongoengine.StringField(max_length=16)  # 操作类别add, delete, update

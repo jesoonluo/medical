@@ -1,4 +1,4 @@
-from .models import room,storage_device,freeze_shelf,freeze_box,log_info
+#from .models import room,storage_device,freeze_shelf,freeze_box,log_info
 from bson.objectid import ObjectId
 import pymongo
 
@@ -21,6 +21,10 @@ class obj(object):
         del my_d['_id']
         return my_d.items()
         
+def now_ts(lite=False):
+    if lite:
+        return datetime.now(pytz.timezone('Asia/Shanghai')).strftime('%Y%m%d%H%M%S')
+    return datetime.now(pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 
 def _query(collection, query, db=None):
     return [obj(i) for i in mg[db][collection].find(query) if i]
@@ -74,6 +78,9 @@ def query_storage_device_by_room_id(room_id, db):
 def query_freeze_shelf_by_store_id(store_id, db):
     return _query('freeze_shelf', {'storageid': store_id}, db)
 
+def query_freeze_box_by_id(box_id, db):
+    return _find_by_id('freeze_box', box_id, db)
+
 def query_storage_by_id(store_id, db):
     return _find_by_id('storage_device', store_id, db)
 
@@ -84,9 +91,32 @@ def query_boxs_by_shelf_id(shelf_id, db):
     return _query('freeze_box', {'shelfid': shelf_id}, db)
 
 def _insert_log(db, table, op_type, op_id, desc_id='', desc_text=''):
-    data = {"operate_table": table, "operate_type": op_type, "operate_id": str(op_id), "operate_desc": desc_text, "destination_id": desc_id}
+    data = {
+        "operate_table": table, 
+        "operate_type": op_type, 
+        "operate_id": str(op_id), 
+        "operate_desc": desc_text, 
+        "destination_id": desc_id,
+        "dt_create": now_ts()
+    }
     try:
         _insert_one('log_info', data, db)
+    except:
+        return False
+    return True
+
+def _insert_sample_log(db, old_box_id, old_box_order, new_box_id, new_box_order, op_user_phone, op_user_name):
+    data = {
+        "old_box_id": str(old_box_id), 
+        "old_box_order": str(old_box_order), 
+        "new_box_id": str(new_box_id), 
+        "new_box_order": str(new_box_id), 
+        "op_user_phone": op_user_phone,
+        "op_user_name": op_user_name,
+        "dt_create": now_ts()
+    }
+    try:
+        _insert_one('sample_log', data, db)
     except:
         return False
     return True
@@ -484,6 +514,34 @@ def add_freeze_box(boxname,boxid,utype,dtype,boxorder,rank,shelf_id,box_note,box
         return None
     return str(insert_id)
 
+def add_sample(sample_id, box_id, sample_order, db, phone, username, sample_name=''):
+    data = dict(
+        sample_id = sample_id,
+        box_id = box_id,               
+        sample_order = sample_order,
+        sample_name = sample_name,
+    )
+    insert_id = ""
+    try:
+        insert_id = _insert_one('sample', data, db)
+        log = _insert_log(db, 'sample', 'add', str(insert_id))
+        sample_log = _insert_sample_log(
+            db=db, 
+            old_box_id='', 
+            old_box_order='', 
+            new_box_id=box_id, 
+            new_box_order=sample_order, 
+            op_user_phone=phone, 
+            op_user_name=username
+        )
+        if not log:
+            raise Exception('日志插入异常')
+    except Exception as e:
+        # 此处输入系统log
+        print(e)
+        return None
+    return str(insert_id)
+
 def query_item_by_code_by_id(utable, parent_id, code_name, db):
     if utable == 'storage':
         rst = _query('freeze_shelf', {'storageid': parent_id, 'shelforder': str(code_name)}, db)
@@ -491,3 +549,17 @@ def query_item_by_code_by_id(utable, parent_id, code_name, db):
     elif utable == 'shelf':
         rst = _query('freeze_box', {'shelfid': parent_id, 'boxorder': str(code_name)}, db)
         return rst[0] if rst else None
+    elif utable == 'box':
+        rst = _query('sample', {'box_id': parent_id, 'sample_order': str(code_name)}, db)
+        return rst[0] if rst else None
+
+def query_sample_by_box_id(box_id, db):
+    rst =  _find_all('sample', {'box_id': str(box_id)}, db)
+    for i in rst:
+        foo = {}
+        foo['box_id'] = i.box_id
+        foo['name'] = i.sample_order
+        foo['dname'] = i.sample_name
+        foo['id'] = i.sample_id
+        rst.append(foo)
+    return rst
