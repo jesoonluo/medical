@@ -64,7 +64,7 @@ def update_unit(request):
     rst = update_unit_db(uid, new_parent_id , dtype, new_postion, db)
     return JsonResponse(rst)
 
-#@query_own_db    
+#@query_own_db
 @csrf_exempt
 def copy_unit(request):
     # db = json.loads(request.COOKIES.get('dbname'))
@@ -157,8 +157,11 @@ def query_all_node(request):
 
 def query_all_node_new(request):
     ''' 获取所有节点 '''
+    print('start_init....')
     # db = json.loads(request.COOKIES.get('dbname'))
     db = 'test'
+    import time
+    one_time = time.time()
     all_room = query_all_room(db)
     rst = {'store':[]}
     if not all_room:
@@ -172,8 +175,10 @@ def query_all_node_new(request):
                 uroom['utype'] = v
         rst['store'].append(uroom)
     else:
+        stores = query_all_storage_device(db)
         for room in all_room:
             uroom = {'dtype': '0'}
+            print('init_room....')
             for k,v in room.items():
                 if k != 'roomtype':
                     uroom[k] = v
@@ -181,30 +186,69 @@ def query_all_node_new(request):
                     uroom['utype'] = v
             rst['store'].append(uroom)
             # 查询room下的设备列表
-            all_store = query_storage_device_by_room_id(str(room.id), db)
-            for store in all_store:
-                ustore = {}
-                format_list = format_storage_list(store.storagetype , store.storageline, store.storagecolumn, store.detailtype, store.id, 'storage', db)
-                ustore['fridge'] = format_list
-                for k,v in store.items():
-                    if k not in ('storagetype','detailtype','room_id', 'storagename'):
-                        ustore[k] = v
-                    elif k == 'storagetype':
-                        ustore['utype'] = v
-                    elif k == 'storagename':
-                        ustore['name'] = v
-                    elif k == 'detailtype':
-                        ustore['dtype'] = v
-                    elif k == 'room_id':
-                        ustore['parent_id'] = v
-                rst['store'].append(ustore)
-                shelfs = query_shelf_by_storage_id_own(str(store._id), db)
-                for shelf in shelfs:
-                    rst['store'].append(shelf)
-                    #查询存储设备里的冻存s
-                    boxs = query_box_by_shelf_id(str(shelf['id']), db)
-                    for box in boxs:
-                        rst['store'].append(box)
+            #all_store = query_storage_device_by_room_id(str(room.id), db)
+            #stores += all_store
+        shelfs = query_all_freeze_shelf(db)
+        for store in stores:
+            print('init_store....')
+            ustore = {}
+            format_list = format_storage_list(store.storagetype , store.storageline, store.storagecolumn, store.detailtype, store.id, 'storage', db)
+            ustore['fridge'] = format_list
+            for k,v in store.items():
+                if k not in ('storagetype','detailtype','room_id', 'storagename'):
+                    ustore[k] = v
+                elif k == 'storagetype':
+                    ustore['utype'] = v
+                elif k == 'storagename':
+                    ustore['name'] = v
+                elif k == 'detailtype':
+                    ustore['dtype'] = v
+                elif k == 'room_id':
+                    ustore['parent_id'] = v
+            rst['store'].append(ustore)
+        boxs = query_all_freeze_box(db)
+        print('start_init_shelf....')
+        print('shelfs_length:',len(shelfs))
+        for shelf in shelfs[:100]:
+            foo = {}
+            format_list = format_shelf_list(shelf.shelfstyle, shelf.shelftype, shelf.shelfline, shelf.shelfcolumn, shelf.id, db)
+            foo['shelf'] = format_list
+            for k,v in shelf.items():
+                if k not in ('shelftype','detailtype','storageid', 'shelfname'):
+                    foo[k] = v
+                elif k == 'shelftype':
+                    foo['utype'] = v
+                elif k == 'shelfname':
+                    foo['name'] = v
+                elif k == 'detailtype':
+                    foo['dtype'] = v
+                elif k == 'storageid':
+                    foo['parent_id'] = v
+            rst['store'].append(foo)
+            #查询存储设备里的冻存s
+            #all_boxs = query_box_by_shelf_id(str(shelf['id']), db)
+            #boxs += all_boxs
+        print('start_init_box....')
+        print('box_length:',len(boxs))
+        for box in boxs[:100]:
+            foo = {}
+            #format_list = format_box_list(box.boxtype, box.boxline, box.boxcolumn, box.id, db)
+            #foo['box'] = format_list
+            for k,v in box.items():
+                if k not in ('boxtype','shelfid','boxname','detailtype'):
+                    foo[k] = v
+                elif k == 'boxtype':
+                    foo['utype'] = v
+                elif k == 'boxname':
+                    foo['name'] = v
+                elif k == 'detailtype':
+                    foo['dtype'] = v
+                elif k == 'shelfid':
+                    foo['parent_id'] = v
+            rst['store'].append(foo)
+    print('end_init....')
+    two_time = time.time()
+    print('用时:', two_time-one_time)
     return JsonResponse(rst)
 
 def query_shelf_by_storage_id(request):
@@ -401,7 +445,7 @@ def add_new_storage_device(request):
              'msg': msg
          }
          return JsonResponse(rst)
-    
+
 
 @csrf_exempt
 def add_new_freeze_shelf(request):
@@ -505,7 +549,7 @@ def add_new_freeze_box(request):
 def add_sample_view(request):
     # cookie 获取db, username, userphone
     db = 'test'
-    phone = ''    
+    phone = ''
     username = ''
     data_list = json.loads(request.POST['data_list'])
     if not isinstance(data_list, list):
@@ -516,7 +560,7 @@ def add_sample_view(request):
             'msg': msg
         }
         return JsonResponse(rst)
-       
+
     for item in data_list:
         box_id = item['box_id']
         box = query_freeze_box_by_id(box_id, db)
@@ -531,7 +575,8 @@ def add_sample_view(request):
         sample_id = item['sample_id']
         sample_order =  item.get('name', '')
         sample_name = item.get("sample_name", "")
-        add_rst = add_sample(sample_id, box_id, sample_order, db, phone, username, sample_name)
+        img_url = item.get("img_url", "")
+        add_rst = add_sample(sample_id, box_id, sample_order, db, phone, username, img_url, sample_name)
         if not add_rst:
             msg = u'添加样本失败'
             rst = {
@@ -541,9 +586,9 @@ def add_sample_view(request):
             }
             return JsonResponse(rst)
     rst = {
-         'success': flag,
+         'success': True,
          'code': 200,
-         'msg': msg
+         'msg': ''
     }
     return JsonResponse(rst)
 
